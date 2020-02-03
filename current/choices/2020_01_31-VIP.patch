@@ -1,7 +1,7 @@
-From 8ff34e14cf38b29a1c13f1d8421f9bc6a4de56ac Mon Sep 17 00:00:00 2001
-From: Lord Psyan <lordpsyan@ircundernet.com>
-Date: Wed, 12 Jun 2019 13:50:24 -0500
-Subject: [PATCH] 2019_06_11-VIP
+From 7b01c653959d249bc079f86aff5bf9aa681070ba Mon Sep 17 00:00:00 2001
+From: LordPsyan <lordpsyan@gmail.com>
+Date: Mon, 3 Feb 2020 13:32:16 -0600
+Subject: [PATCH] 2020_01_31-VIP
 
 ---
  sql/LordPsyan-Patches/auth/auth.vip.sql       | 21 +++++
@@ -51,10 +51,10 @@ index 0000000000..89fc6132c0
 +('vip bank', 999, 'Syntax: .vip bank'),
 +('vip mail', 999, 'Syntax: .vip mail');
 diff --git a/src/server/database/Database/Implementation/LoginDatabase.cpp b/src/server/database/Database/Implementation/LoginDatabase.cpp
-index a73d43e0a7..3a4327e753 100644
+index fccd21a83f..de58d86edc 100644
 --- a/src/server/database/Database/Implementation/LoginDatabase.cpp
 +++ b/src/server/database/Database/Implementation/LoginDatabase.cpp
-@@ -108,6 +108,8 @@ void LoginDatabaseConnection::DoPrepareStatements()
+@@ -109,6 +109,8 @@ void LoginDatabaseConnection::DoPrepareStatements()
      // 0: uint32, 1: string, 2: string                      // Complete name: "Login_Insert_Failed_Account_Login_due_password_IP_Logging"
      PrepareStatement(LOGIN_INS_FALP_IP_LOGGING, "INSERT INTO logs_ip_actions (account_id,character_guid,type,ip,systemnote,unixtime,time) VALUES (?, 0, 1, ?, ?, unix_timestamp(NOW()), NOW())", CONNECTION_ASYNC);
      PrepareStatement(LOGIN_SEL_ACCOUNT_ACCESS_BY_ID, "SELECT gmlevel, RealmID FROM account_access WHERE id = ? and (RealmID = ? OR RealmID = -1) ORDER BY gmlevel desc", CONNECTION_SYNCH);
@@ -64,10 +64,10 @@ index a73d43e0a7..3a4327e753 100644
      PrepareStatement(LOGIN_SEL_RBAC_ACCOUNT_PERMISSIONS, "SELECT permissionId, granted FROM rbac_account_permissions WHERE accountId = ? AND (realmId = ? OR realmId = -1) ORDER BY permissionId, realmId", CONNECTION_BOTH);
      PrepareStatement(LOGIN_INS_RBAC_ACCOUNT_PERMISSION, "INSERT INTO rbac_account_permissions (accountId, permissionId, granted, realmId) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE granted = VALUES(granted)", CONNECTION_ASYNC);
 diff --git a/src/server/database/Database/Implementation/LoginDatabase.h b/src/server/database/Database/Implementation/LoginDatabase.h
-index 1fdfe9253c..86f038be4c 100644
+index f9a1896072..cb40c214ea 100644
 --- a/src/server/database/Database/Implementation/LoginDatabase.h
 +++ b/src/server/database/Database/Implementation/LoginDatabase.h
-@@ -103,6 +103,9 @@ enum LoginDatabaseStatements : uint32
+@@ -104,6 +104,9 @@ enum LoginDatabaseStatements : uint32
      LOGIN_INS_CHAR_IP_LOGGING,
      LOGIN_INS_FALP_IP_LOGGING,
  
@@ -78,10 +78,10 @@ index 1fdfe9253c..86f038be4c 100644
      LOGIN_SEL_RBAC_ACCOUNT_PERMISSIONS,
      LOGIN_INS_RBAC_ACCOUNT_PERMISSION,
 diff --git a/src/server/game/Entities/Player/Player.cpp b/src/server/game/Entities/Player/Player.cpp
-index 80f070baa9..30883ec776 100644
+index 30444f2f2f..c382031344 100644
 --- a/src/server/game/Entities/Player/Player.cpp
 +++ b/src/server/game/Entities/Player/Player.cpp
-@@ -6526,6 +6526,9 @@ void Player::CheckAreaExploreAndOutdoor()
+@@ -6529,6 +6529,9 @@ void Player::CheckAreaExploreAndOutdoor()
                      XP = std::max(minScaledXP, XP);
                  }
  
@@ -91,7 +91,7 @@ index 80f070baa9..30883ec776 100644
                  GiveXP(XP, nullptr);
                  SendExplorationExperience(areaId, XP);
              }
-@@ -6895,7 +6898,8 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
+@@ -6904,7 +6907,8 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
      // 34
      // 35
      // 36
@@ -101,7 +101,7 @@ index 80f070baa9..30883ec776 100644
      // 38
      // 39
      // 40
-@@ -15211,7 +15215,8 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver,
+@@ -15242,7 +15246,8 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver,
      // 49
      // 50
      // 51
@@ -112,10 +112,10 @@ index 80f070baa9..30883ec776 100644
      // 54
      // 55
 diff --git a/src/server/game/Miscellaneous/Formulas.h b/src/server/game/Miscellaneous/Formulas.h
-index 8040068f38..acf7b3f06f 100644
+index eb5e70bb6c..0fe81c96a8 100644
 --- a/src/server/game/Miscellaneous/Formulas.h
 +++ b/src/server/game/Miscellaneous/Formulas.h
-@@ -31,7 +31,7 @@
+@@ -30,7 +30,7 @@
  // Prepatch by LordPsyan
  // 01
  // 02
@@ -124,7 +124,7 @@ index 8040068f38..acf7b3f06f 100644
  // 04
  // 05
  // 06
-@@ -249,6 +249,9 @@ namespace Trinity
+@@ -248,6 +248,9 @@ namespace Trinity
                  if (creature && creature->m_PlayerDamageReq) // if players dealt less than 50% of the damage and were credited anyway (due to CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ), scale XP gained appropriately (linear scaling)
                      xpMod *= 1.0f - 2.0f * creature->m_PlayerDamageReq / creature->GetMaxHealth();
  
@@ -135,10 +135,10 @@ index 8040068f38..acf7b3f06f 100644
                  }
              }
 diff --git a/src/server/game/Miscellaneous/Language.h b/src/server/game/Miscellaneous/Language.h
-index d5194e06c9..403326e378 100644
+index c1c9d2e793..8fe682bdf1 100644
 --- a/src/server/game/Miscellaneous/Language.h
 +++ b/src/server/game/Miscellaneous/Language.h
-@@ -1149,7 +1149,7 @@ enum TrinityStrings
+@@ -1168,7 +1168,7 @@ enum TrinityStrings
      // 15
      // 16
      // 17
@@ -148,10 +148,10 @@ index d5194e06c9..403326e378 100644
      // 20
      // Visit http://www.realmsofwarcraft.com/bb for forums and information
 diff --git a/src/server/game/Reputation/ReputationMgr.cpp b/src/server/game/Reputation/ReputationMgr.cpp
-index 09276848a4..6244a8e4f3 100644
+index 197518ae62..a014b60106 100644
 --- a/src/server/game/Reputation/ReputationMgr.cpp
 +++ b/src/server/game/Reputation/ReputationMgr.cpp
-@@ -368,6 +368,10 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, in
+@@ -382,6 +382,10 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, in
          {
              // int32 *= float cause one point loss?
              standing = int32(floor((float)standing * sWorld->getRate(RATE_REPUTATION_GAIN) + 0.5f));
@@ -163,10 +163,10 @@ index 09276848a4..6244a8e4f3 100644
          }
  
 diff --git a/src/server/game/Server/WorldSession.cpp b/src/server/game/Server/WorldSession.cpp
-index dafb08bd2c..2676f99c44 100644
+index a6b0f64501..538efbbd32 100644
 --- a/src/server/game/Server/WorldSession.cpp
 +++ b/src/server/game/Server/WorldSession.cpp
-@@ -104,7 +104,7 @@ bool WorldSessionFilter::Process(WorldPacket* packet)
+@@ -103,7 +103,7 @@ bool WorldSessionFilter::Process(WorldPacket* packet)
  }
  
  /// WorldSession constructor
@@ -175,7 +175,7 @@ index dafb08bd2c..2676f99c44 100644
      m_muteTime(mute_time),
      m_timeOutTime(0),
      AntiDOS(this),
-@@ -112,6 +112,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
+@@ -111,6 +111,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
      _player(nullptr),
      m_Socket(sock),
      _security(sec),
@@ -184,10 +184,10 @@ index dafb08bd2c..2676f99c44 100644
      _accountName(std::move(name)),
      m_expansion(expansion),
 diff --git a/src/server/game/Server/WorldSession.h b/src/server/game/Server/WorldSession.h
-index 27098fc60c..c1db2f572d 100644
+index 2fec036002..7a5a603892 100644
 --- a/src/server/game/Server/WorldSession.h
 +++ b/src/server/game/Server/WorldSession.h
-@@ -273,7 +273,7 @@ struct PacketCounter
+@@ -279,7 +279,7 @@ struct PacketCounter
  class TC_GAME_API WorldSession
  {
      public:
@@ -196,7 +196,7 @@ index 27098fc60c..c1db2f572d 100644
          ~WorldSession();
  
          bool PlayerLoading() const { return m_playerLoading; }
-@@ -310,6 +310,7 @@ class TC_GAME_API WorldSession
+@@ -316,6 +316,7 @@ class TC_GAME_API WorldSession
          void InvalidateRBACData(); // Used to force LoadPermissions at next HasPermission check
  
          AccountTypes GetSecurity() const { return _security; }
@@ -204,19 +204,19 @@ index 27098fc60c..c1db2f572d 100644
          uint32 GetAccountId() const { return _accountId; }
          Player* GetPlayer() const { return _player; }
          std::string const& GetPlayerName() const;
-@@ -1056,6 +1057,7 @@ class TC_GAME_API WorldSession
+@@ -1057,6 +1058,7 @@ class TC_GAME_API WorldSession
          uint32 _accountId;
          std::string _accountName;
          uint8 m_expansion;
 +        bool _ispremium;
  
-         typedef std::list<AddonInfo> AddonsList;
- 
+         // Warden
+         Warden* _warden;                                    // Remains NULL if Warden system is not enabled by config
 diff --git a/src/server/game/Server/WorldSocket.cpp b/src/server/game/Server/WorldSocket.cpp
-index 69d8be6c8b..f0296e9100 100644
+index 2d8153d7d6..aec9d8c9c6 100644
 --- a/src/server/game/Server/WorldSocket.cpp
 +++ b/src/server/game/Server/WorldSocket.cpp
-@@ -511,7 +511,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
+@@ -510,7 +510,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
  
      // Check that Key and account name are the same on client and server
      uint32 t = 0;
@@ -225,7 +225,7 @@ index 69d8be6c8b..f0296e9100 100644
      SHA1Hash sha;
      sha.UpdateData(authSession->Account);
      sha.UpdateData((uint8*)&t, 4);
-@@ -578,6 +578,16 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
+@@ -577,6 +577,16 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
          return;
      }
  
@@ -242,7 +242,7 @@ index 69d8be6c8b..f0296e9100 100644
      // Check locked state for server
      AccountTypes allowedAccountType = sWorld->GetPlayerSecurityLimit();
      TC_LOG_DEBUG("network", "Allowed Level: %u Player Level %u", allowedAccountType, account.Security);
-@@ -605,7 +615,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
+@@ -604,7 +614,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
  
      _authed = true;
      _worldSession = new WorldSession(account.Id, std::move(authSession->Account), shared_from_this(), account.Security,
@@ -252,10 +252,10 @@ index 69d8be6c8b..f0296e9100 100644
  
      // Initialize Warden system only if it is enabled by config
 diff --git a/src/server/game/World/World.cpp b/src/server/game/World/World.cpp
-index 4d7d254025..9ddfc81a0b 100644
+index 86c38d6aa4..b652ae707e 100644
 --- a/src/server/game/World/World.cpp
 +++ b/src/server/game/World/World.cpp
-@@ -548,6 +548,14 @@ void World::LoadConfigSettings(bool reload)
+@@ -568,6 +568,14 @@ void World::LoadConfigSettings(bool reload)
      rate_values[RATE_XP_QUEST]    = sConfigMgr->GetFloatDefault("Rate.XP.Quest", 1.0f);
      rate_values[RATE_XP_EXPLORE]  = sConfigMgr->GetFloatDefault("Rate.XP.Explore", 1.0f);
  
@@ -271,10 +271,10 @@ index 4d7d254025..9ddfc81a0b 100644
      rate_values[RATE_XP_BOOST] = sConfigMgr->GetFloatDefault("XP.Boost.Rate", 2.0f);
  
 diff --git a/src/server/game/World/World.h b/src/server/game/World/World.h
-index e04249bc66..08b424b3e7 100644
+index 975cd0d06f..198399d002 100644
 --- a/src/server/game/World/World.h
 +++ b/src/server/game/World/World.h
-@@ -100,6 +100,8 @@ enum WorldBoolConfigs
+@@ -99,6 +99,8 @@ enum WorldBoolConfigs
      CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD,
      CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION,
      CONFIG_ALLOW_TWO_SIDE_TRADE,
@@ -283,7 +283,7 @@ index e04249bc66..08b424b3e7 100644
      CONFIG_ALL_TAXI_PATHS,
      CONFIG_INSTANT_TAXI,
      CONFIG_INSTANCE_IGNORE_LEVEL,
-@@ -554,6 +556,13 @@ enum Rates
+@@ -556,6 +558,13 @@ enum Rates
      RATE_XP_BG_KILL,
      RATE_XP_QUEST,
      RATE_XP_EXPLORE,
@@ -395,7 +395,7 @@ index 0000000000..0d63584629
 +}
 \ No newline at end of file
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index f50854c308..8c0c764723 100644
+index b6b83ac184..305fe92c93 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -167,7 +167,8 @@
@@ -419,10 +419,10 @@ index f50854c308..8c0c764723 100644
  // end154
  // end155
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index a49f679610..b59fa0830e 100644
+index afa4fcccce..13cc96be5b 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -3015,6 +3015,22 @@ CharDelete.KeepDays = 30
+@@ -3059,6 +3059,22 @@ CharDelete.KeepDays = 30
  #
  ###################################################################################################
  
@@ -446,5 +446,5 @@ index a49f679610..b59fa0830e 100644
  # CUSTOM SERVER OPTIONS
  #
 -- 
-2.21.0
+2.20.1
 
