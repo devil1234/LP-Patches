@@ -1,17 +1,17 @@
-From d757be5c440a5d0be3097a75d13d1a910056e4eb Mon Sep 17 00:00:00 2001
+From 7934bf5b2b45e131bb91dd54964e7ffa89626759 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Fri, 28 Sep 2018 04:47:53 -0500
-Subject: [PATCH] 2018_09_27-Account_Mounts
+Date: Tue, 4 Feb 2020 08:07:01 -0600
+Subject: [PATCH] 2020_01_31-Account_Mounts
 
 ---
- src/server/scripts/Custom/account_mount.cpp        | 57 ++++++++++++++++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |  6 ++-
+ src/server/scripts/Custom/account_mount.cpp   | 57 +++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |  6 +-
  2 files changed, 61 insertions(+), 2 deletions(-)
  create mode 100644 src/server/scripts/Custom/account_mount.cpp
 
 diff --git a/src/server/scripts/Custom/account_mount.cpp b/src/server/scripts/Custom/account_mount.cpp
 new file mode 100644
-index 0000000000..7b3db69a53
+index 0000000000..945642b8cf
 --- /dev/null
 +++ b/src/server/scripts/Custom/account_mount.cpp
 @@ -0,0 +1,57 @@
@@ -40,7 +40,7 @@ index 0000000000..7b3db69a53
 +            uint32 guid = fields[0].GetUInt32();
 +            uint32 race = fields[1].GetUInt8();
 +
-+            if ((Player::TeamForRace(race) == Player::TeamForRace(player->getRace())) || !limitrace)
++            if ((Player::TeamForRace(race) == Player::TeamForRace(player->GetRace())) || !limitrace)
 +                Guids.push_back(result1->Fetch()[0].GetUInt32());
 +
 +        } while (result1->NextRow());
@@ -74,7 +74,7 @@ index 0000000000..7b3db69a53
 +}
 \ No newline at end of file
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..393739402e 100644
+index b6b83ac184..4f0851e5ab 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -104,7 +104,8 @@
@@ -98,5 +98,5 @@ index 5412cf1942..393739402e 100644
  // end91
  // end92
 -- 
-2.11.0
+2.20.1
 

@@ -1,15 +1,15 @@
-From a4de44cccc05d725bf8d0dbe81498719fc01f65f Mon Sep 17 00:00:00 2001
+From c3fcaf693a0bd14a31f3ac8a4550cff7181c725c Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Fri, 28 Sep 2018 05:40:23 -0500
-Subject: [PATCH] 2018_09_27-AIO
+Date: Tue, 4 Feb 2020 14:18:40 -0600
+Subject: [PATCH] 2020_01_31-AIO
 
 ---
- sql/LordPsyan-Patches/auth/auth.aio.sql            |   11 +
- .../characters/characters.aio.sql                  |    1 +
- sql/LordPsyan-Patches/world/world.aio.sql          |   31 +
- src/server/game/Miscellaneous/Language.h           |   13 +-
- src/server/scripts/Custom/all-in-one.cpp           | 1358 ++++++++++++++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |    6 +-
+ sql/LordPsyan-Patches/auth/auth.aio.sql       |   11 +
+ .../characters/characters.aio.sql             |    1 +
+ sql/LordPsyan-Patches/world/world.aio.sql     |   31 +
+ src/server/game/Miscellaneous/Language.h      |   13 +-
+ src/server/scripts/Custom/all-in-one.cpp      | 1358 +++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |    6 +-
  6 files changed, 1417 insertions(+), 3 deletions(-)
  create mode 100644 sql/LordPsyan-Patches/auth/auth.aio.sql
  create mode 100644 sql/LordPsyan-Patches/characters/characters.aio.sql
@@ -78,13 +78,13 @@ index 0000000000..faa013fce9
 +('80000','0','0','0','0','0','2591','0','0','0','Young Woman','You need it, I got it.','','0','80','80','0','35','1','1','1.14286','1','1','0','1500','0','1','1','1','0','2048','0','0','0','0','0','0','7','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','EventAI','0','1','1','1','1','1','1','0','0','1','0','0','npc_all','0');
 +-- end
 diff --git a/src/server/game/Miscellaneous/Language.h b/src/server/game/Miscellaneous/Language.h
-index 5663ae4b65..6ab2d10524 100644
+index c1c9d2e793..b37c598c33 100644
 --- a/src/server/game/Miscellaneous/Language.h
 +++ b/src/server/game/Miscellaneous/Language.h
-@@ -741,7 +741,18 @@ enum TrinityStrings
-     LANG_NPCINFO_SPELLCLICK               = 840,
-     LANG_NPCINFO_MAILBOX                  = 841,
-     LANG_NPCINFO_PLAYER_VEHICLE           = 842,
+@@ -727,7 +727,18 @@ enum TrinityStrings
+     LANG_COMMAND_CREATURESTORAGE_NOTFOUND  = 818,
+ 
+     LANG_CHANNEL_CITY                     = 819,
 -
 +// Start AIO by LordPsyan
 +    LANG_SOTA                           = 990,
@@ -1466,7 +1466,7 @@ index 0000000000..24623b34da
 +    new npc_all();
 +}
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..c75eacbdb8 100644
+index b6b83ac184..5e21a20ef3 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -16,7 +16,8 @@
@@ -1490,5 +1490,5 @@ index 5412cf1942..c75eacbdb8 100644
  // end03
  // end04
 -- 
-2.11.0
+2.20.1
 
