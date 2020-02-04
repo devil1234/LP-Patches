@@ -1,7 +1,7 @@
-From 2c62e2d126c7fce18aea06e70e4993af2212b81a Mon Sep 17 00:00:00 2001
-From: Lord Psyan <lordpsyan@ircundernet.com>
-Date: Tue, 11 Jun 2019 20:54:00 -0500
-Subject: [PATCH] 2019_06_11-Passive_AntiCheat.patch
+From 24c9d66221d0c862fd4a4effddde626318b821bd Mon Sep 17 00:00:00 2001
+From: LordPsyan <lordpsyan@gmail.com>
+Date: Tue, 4 Feb 2020 05:58:58 -0600
+Subject: [PATCH] 2020_01_31-Passive_AntiCheat.patch
 
 ---
  .../characters/characters.anticheat.sql       |  31 ++
@@ -13,12 +13,12 @@ Subject: [PATCH] 2019_06_11-Passive_AntiCheat.patch
  src/server/game/Anticheat/AnticheatScripts.h  |  32 ++
  src/server/game/Entities/Player/Player.cpp    |   7 +
  src/server/game/Handlers/MovementHandler.cpp  |   4 +
- src/server/game/World/World.cpp               |   8 +
+ src/server/game/World/World.cpp               |   7 +
  src/server/game/World/World.h                 |   4 +
  src/server/scripts/Commands/cs_anticheat.cpp  | 265 +++++++++++
  .../scripts/Commands/cs_script_loader.cpp     |   7 +
  src/server/worldserver/worldserver.conf.dist  |  34 ++
- 14 files changed, 1166 insertions(+)
+ 14 files changed, 1165 insertions(+)
  create mode 100644 sql/LordPsyan-Patches/characters/characters.anticheat.sql
  create mode 100644 src/server/game/Anticheat/AnticheatData.cpp
  create mode 100644 src/server/game/Anticheat/AnticheatData.h
@@ -908,10 +908,10 @@ index 0000000000..1e6aa764db
 +
 +#endif
 diff --git a/src/server/game/Entities/Player/Player.cpp b/src/server/game/Entities/Player/Player.cpp
-index 80f070baa9..5264c5d073 100644
+index 30444f2f2f..d55944f914 100644
 --- a/src/server/game/Entities/Player/Player.cpp
 +++ b/src/server/game/Entities/Player/Player.cpp
-@@ -19,6 +19,7 @@
+@@ -18,6 +18,7 @@
  #include "Player.h"
  #include "AccountMgr.h"
  #include "AchievementMgr.h"
@@ -919,7 +919,7 @@ index 80f070baa9..5264c5d073 100644
  #include "ArenaTeam.h"
  #include "ArenaTeamMgr.h"
  #include "Bag.h"
-@@ -19609,6 +19610,12 @@ void Player::SaveToDB(bool create /*=false*/)
+@@ -19678,6 +19679,12 @@ void Player::SaveToDB(bool create /*=false*/)
  
      CharacterDatabase.CommitTransaction(trans);
  
@@ -933,10 +933,10 @@ index 80f070baa9..5264c5d073 100644
      if (Pet* pet = GetPet())
          pet->SavePetToDB(PET_SAVE_AS_CURRENT);
 diff --git a/src/server/game/Handlers/MovementHandler.cpp b/src/server/game/Handlers/MovementHandler.cpp
-index e2030f6230..caedf4f1e6 100644
+index 7f4d1a053b..d9289adcb3 100644
 --- a/src/server/game/Handlers/MovementHandler.cpp
 +++ b/src/server/game/Handlers/MovementHandler.cpp
-@@ -16,6 +16,7 @@
+@@ -15,6 +15,7 @@
   * with this program. If not, see <http://www.gnu.org/licenses/>.
   */
  
@@ -944,7 +944,7 @@ index e2030f6230..caedf4f1e6 100644
  #include "Common.h"
  #include "WorldPacket.h"
  #include "WorldSession.h"
-@@ -370,6 +371,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
+@@ -369,6 +370,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
          plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetBaseMap()->IsUnderWater(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
      }
  
@@ -955,18 +955,18 @@ index e2030f6230..caedf4f1e6 100644
      WorldPacket data(opcode, recvData.size());
      int64 movementTime = (int64) movementInfo.time + _timeSyncClockDelta;
 diff --git a/src/server/game/World/World.cpp b/src/server/game/World/World.cpp
-index 4d7d254025..5d71c2ee73 100644
+index 86c38d6aa4..7140f4a883 100644
 --- a/src/server/game/World/World.cpp
 +++ b/src/server/game/World/World.cpp
-@@ -29,6 +29,7 @@
+@@ -28,6 +28,7 @@
  #include "AuctionHouseMgr.h"
  #include "BattlefieldMgr.h"
  #include "BattlegroundMgr.h"
 +#include "AnticheatMgr.h"
  #include "CalendarMgr.h"
- #include "Channel.h"
+ #include "ChannelMgr.h"
  #include "CharacterCache.h"
-@@ -1475,6 +1476,11 @@ void World::LoadConfigSettings(bool reload)
+@@ -1510,6 +1511,11 @@ void World::LoadConfigSettings(bool reload)
      m_bool_configs[CONFIG_PDUMP_NO_OVERWRITE] = sConfigMgr->GetBoolDefault("PlayerDump.DisallowOverwrite", true);
      m_bool_configs[CONFIG_UI_QUESTLEVELS_IN_DIALOGS] = sConfigMgr->GetBoolDefault("UI.ShowQuestLevelsInDialogs", false);
  
@@ -978,20 +978,19 @@ index 4d7d254025..5d71c2ee73 100644
      // Wintergrasp battlefield
      m_bool_configs[CONFIG_WINTERGRASP_ENABLE] = sConfigMgr->GetBoolDefault("Wintergrasp.Enable", false);
      m_int_configs[CONFIG_WINTERGRASP_PLR_MAX] = sConfigMgr->GetIntDefault("Wintergrasp.PlayerMax", 100);
-@@ -3291,6 +3297,8 @@ void World::ResetDailyQuests()
+@@ -3232,6 +3238,7 @@ void World::ResetDailyQuests()
+     // reselect pools
+     sQuestPoolMgr->ChangeDailyQuests();
  
-     // change available dailies
-     sPoolMgr->ChangeDailyQuests();
-+
 +    sAnticheatMgr->ResetDailyReportStates();
- }
- 
- void World::LoadDBAllowedSecurityLevel()
+     // store next reset time
+     time_t now = GameTime::GetGameTime();
+     time_t next = GetNextDailyResetTime(now);
 diff --git a/src/server/game/World/World.h b/src/server/game/World/World.h
-index e04249bc66..174836083c 100644
+index 975cd0d06f..4af03b9c54 100644
 --- a/src/server/game/World/World.h
 +++ b/src/server/game/World/World.h
-@@ -149,6 +149,7 @@ enum WorldBoolConfigs
+@@ -147,6 +147,7 @@ enum WorldBoolConfigs
      CONFIG_DELETE_CHARACTER_TICKET_TRACE,
      CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES,
      CONFIG_PRESERVE_CUSTOM_CHANNELS,
@@ -999,8 +998,8 @@ index e04249bc66..174836083c 100644
      CONFIG_PDUMP_NO_PATHS,
      CONFIG_PDUMP_NO_OVERWRITE,
      CONFIG_QUEST_IGNORE_AUTO_ACCEPT,
-@@ -434,7 +435,10 @@ enum WorldIntConfigs
-     CONFIG_PRESERVE_CUSTOM_CHANNEL_DURATION,
+@@ -436,7 +437,10 @@ enum WorldIntConfigs
+     CONFIG_PRESERVE_CUSTOM_CHANNEL_INTERVAL,
      CONFIG_PERSISTENT_CHARACTER_CLEAN_FLAGS,
      CONFIG_LFG_OPTIONSMASK,
 +    CONFIG_ANTICHEAT_REPORTS_INGAME_NOTIFICATION,
@@ -1282,7 +1281,7 @@ index 0000000000..3a1b076bd7
 +    new anticheat_commandscript();
 +}
 diff --git a/src/server/scripts/Commands/cs_script_loader.cpp b/src/server/scripts/Commands/cs_script_loader.cpp
-index 8b13a09d59..6e25bbc098 100644
+index dd8fb48f22..9a13616d7a 100644
 --- a/src/server/scripts/Commands/cs_script_loader.cpp
 +++ b/src/server/scripts/Commands/cs_script_loader.cpp
 @@ -15,10 +15,15 @@
@@ -1316,10 +1315,10 @@ index 8b13a09d59..6e25bbc098 100644
 +    sAnticheatMgr->StartScripts();
  }
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index a49f679610..6b9974353c 100644
+index afa4fcccce..849da62423 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -3244,6 +3244,40 @@ LevelReq.Auction = 1
+@@ -3288,6 +3288,40 @@ LevelReq.Auction = 1
  
  LevelReq.Mail = 1
  
@@ -1361,5 +1360,5 @@ index a49f679610..6b9974353c 100644
  #     PlayerDump.DisallowPaths
  #        Description: Disallow using paths in PlayerDump output files
 -- 
-2.21.0
+2.20.1
 
