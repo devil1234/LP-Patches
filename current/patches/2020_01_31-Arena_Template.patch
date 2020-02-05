@@ -1,15 +1,15 @@
-From bc2e35d785487c61514d99b56794de9c6eda4d65 Mon Sep 17 00:00:00 2001
+From 7b4ca5b568007f1a29251c29bcc86fcc77b54748 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Fri, 28 Sep 2018 17:44:30 -0500
-Subject: [PATCH] 2018_09_27-Arena_Template
+Date: Wed, 5 Feb 2020 14:19:43 -0600
+Subject: [PATCH] 2020_01_31-Arena_Template
 
 ---
- .../characters/characters.arenatemplate.sql        | 2469 ++++++++++++++++++++
- .../world/world.arenatemplate.sql                  |    3 +
- src/server/game/World/World.cpp                    |   21 +-
- src/server/scripts/Custom/TemplateNPC.cpp          | 1506 ++++++++++++
- src/server/scripts/Custom/TemplateNPC.h            |  257 ++
- src/server/scripts/Custom/custom_script_loader.cpp |    6 +-
+ .../characters/characters.arenatemplate.sql   | 2469 +++++++++++++++++
+ .../world/world.arenatemplate.sql             |    3 +
+ src/server/game/World/World.cpp               |   21 +-
+ src/server/scripts/Custom/TemplateNPC.cpp     | 1506 ++++++++++
+ src/server/scripts/Custom/TemplateNPC.h       |  257 ++
+ .../scripts/Custom/custom_script_loader.cpp   |    6 +-
  6 files changed, 4259 insertions(+), 3 deletions(-)
  create mode 100644 sql/LordPsyan-Patches/characters/characters.arenatemplate.sql
  create mode 100644 sql/LordPsyan-Patches/world/world.arenatemplate.sql
@@ -2501,7 +2501,7 @@ index 0000000000..81a7a9ae60
 +INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entry_2`, `difficulty_entry_3`, `KillCredit1`, `KillCredit2`, `modelid1`, `modelid2`, `modelid3`, `modelid4`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `scale`, `rank`, `dmgschool`, `BaseAttackTime`, `RangeAttackTime`, `BaseVariance`, `RangeVariance`, `unit_class`, `unit_flags`, `unit_flags2`, `dynamicflags`, `family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `spell1`, `spell2`, `spell3`, `spell4`, `spell5`, `spell6`, `spell7`, `spell8`, `PetSpellDataId`, `VehicleId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `HoverHeight`, `HealthModifier`, `ManaModifier`, `ArmorModifier`, `DamageModifier`, `ExperienceModifier`, `RacialLeader`, `movementId`, `RegenHealth`, `mechanic_immune_mask`, `flags_extra`, `ScriptName`, `VerifiedBuild`) VALUES
 +('60014','0','0','0','0','0','28930','28930','28930','28930','Lady of the Arena','Arena Template NPC','','0','80','80','0','35','1','1','1.14286','1','0','0','0','0','1','1','1','0','0','0','0','0','0','0','0','7','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','','0','1','5','1','1','1','1','0','0','1','0','0','TemplateNPC','1');
 diff --git a/src/server/game/World/World.cpp b/src/server/game/World/World.cpp
-index 82dbe507d3..b9c4e7c89c 100644
+index 86c38d6aa4..e325bdbd33 100644
 --- a/src/server/game/World/World.cpp
 +++ b/src/server/game/World/World.cpp
 @@ -93,7 +93,7 @@
@@ -2513,7 +2513,7 @@ index 82dbe507d3..b9c4e7c89c 100644
  // 08
  // 09
  // 10
-@@ -2210,6 +2210,25 @@ void World::SetInitialWorldSettings()
+@@ -2261,6 +2261,25 @@ void World::SetInitialWorldSettings()
          });
      }
  
@@ -2541,7 +2541,7 @@ index 82dbe507d3..b9c4e7c89c 100644
      TC_LOG_INFO("server.worldserver", "World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000));
 diff --git a/src/server/scripts/Custom/TemplateNPC.cpp b/src/server/scripts/Custom/TemplateNPC.cpp
 new file mode 100644
-index 0000000000..4ccdf38b6b
+index 0000000000..4e8bc9ef2a
 --- /dev/null
 +++ b/src/server/scripts/Custom/TemplateNPC.cpp
 @@ -0,0 +1,1506 @@
@@ -2557,7 +2557,7 @@ index 0000000000..4ccdf38b6b
 +
 +void sTemplateNPC::LearnPlateMailSpells(Player* player)
 +{
-+    switch (player->getClass())
++    switch (player->GetClass())
 +    {
 +    case CLASS_WARRIOR:
 +    case CLASS_PALADIN:
@@ -2626,7 +2626,7 @@ index 0000000000..4ccdf38b6b
 +
 +void sTemplateNPC::EquipTemplateGear(Player* player)
 +{
-+    if (player->getRace() == RACE_HUMAN)
++    if (player->GetRace() == RACE_HUMAN)
 +    {
 +        for (HumanGearContainer::const_iterator itr = m_HumanGearContainer.begin(); itr != m_HumanGearContainer.end(); ++itr)
 +        {
@@ -2642,7 +2642,7 @@ index 0000000000..4ccdf38b6b
 +            }
 +        }
 +    }
-+    else if (player->GetTeam() == ALLIANCE && player->getRace() != RACE_HUMAN)
++    else if (player->GetTeam() == ALLIANCE && player->GetRace() != RACE_HUMAN)
 +    {
 +        for (AllianceGearContainer::const_iterator itr = m_AllianceGearContainer.begin(); itr != m_AllianceGearContainer.end(); ++itr)
 +        {
@@ -2875,7 +2875,7 @@ index 0000000000..4ccdf38b6b
 +
 +std::string sTemplateNPC::GetClassString(Player* player)
 +{
-+    switch (player->getClass())
++    switch (player->GetClass())
 +    {
 +    case CLASS_PRIEST:       return "Priest";      break;
 +    case CLASS_PALADIN:      return "Paladin";     break;
@@ -2900,13 +2900,13 @@ index 0000000000..4ccdf38b6b
 +    CharacterDatabase.PExecute("DELETE FROM template_npc_glyphs WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
 +
 +    // Delete old gear templates before extracting new ones
-+    if (player->getRace() == RACE_HUMAN)
++    if (player->GetRace() == RACE_HUMAN)
 +    {
 +        CharacterDatabase.PExecute("DELETE FROM template_npc_human WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
 +        player->GetSession()->SendAreaTriggerMessage("Template successfuly created!");
 +        return false;
 +    }
-+    else if (player->GetTeam() == ALLIANCE && player->getRace() != RACE_HUMAN)
++    else if (player->GetTeam() == ALLIANCE && player->GetRace() != RACE_HUMAN)
 +    {
 +        CharacterDatabase.PExecute("DELETE FROM template_npc_alliance WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
 +        player->GetSession()->SendAreaTriggerMessage("Template successfuly created!");
@@ -2929,14 +2929,14 @@ index 0000000000..4ccdf38b6b
 +
 +        if (equippedItem)
 +        {
-+            if (player->getRace() == RACE_HUMAN)
++            if (player->GetRace() == RACE_HUMAN)
 +            {
 +                CharacterDatabase.PExecute("INSERT INTO template_npc_human (`playerClass`, `playerSpec`, `pos`, `itemEntry`, `enchant`, `socket1`, `socket2`, `socket3`, `bonusEnchant`, `prismaticEnchant`) VALUES ('%s', '%s', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u');"
 +                    , GetClassString(player).c_str(), playerSpecStr.c_str(), equippedItem->GetSlot(), equippedItem->GetEntry(), equippedItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT),
 +                    equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT), equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_2), equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_3),
 +                    equippedItem->GetEnchantmentId(BONUS_ENCHANTMENT_SLOT), equippedItem->GetEnchantmentId(PRISMATIC_ENCHANTMENT_SLOT));
 +            }
-+            else if (player->GetTeam() == ALLIANCE && player->getRace() != RACE_HUMAN)
++            else if (player->GetTeam() == ALLIANCE && player->GetRace() != RACE_HUMAN)
 +            {
 +                CharacterDatabase.PExecute("INSERT INTO template_npc_alliance (`playerClass`, `playerSpec`, `pos`, `itemEntry`, `enchant`, `socket1`, `socket2`, `socket3`, `bonusEnchant`, `prismaticEnchant`) VALUES ('%s', '%s', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u');"
 +                    , GetClassString(player).c_str(), playerSpecStr.c_str(), equippedItem->GetSlot(), equippedItem->GetEntry(), equippedItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT),
@@ -3036,7 +3036,7 @@ index 0000000000..4ccdf38b6b
 +
 +bool sTemplateNPC::CanEquipTemplate(Player* player, std::string& playerSpecStr)
 +{
-+    if (player->getRace() == RACE_HUMAN)
++    if (player->GetRace() == RACE_HUMAN)
 +    {
 +        QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec FROM template_npc_human "
 +            "WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
@@ -3044,7 +3044,7 @@ index 0000000000..4ccdf38b6b
 +        if (!result)
 +            return false;
 +    }
-+    else if (player->GetTeam() == ALLIANCE && player->getRace() != RACE_HUMAN)
++    else if (player->GetTeam() == ALLIANCE && player->GetRace() != RACE_HUMAN)
 +    {
 +        QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec FROM template_npc_alliance "
 +            "WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
@@ -3156,7 +3156,7 @@ index 0000000000..4ccdf38b6b
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
 +
-+        if (player->getClass() != CLASS_PRIEST)
++        if (player->GetClass() != CLASS_PRIEST)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a priest!");
 +            return false;
@@ -3174,7 +3174,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreatePriestShadowItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_PRIEST)
++        if (player->GetClass() != CLASS_PRIEST)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a priest!");
 +            return false;
@@ -3192,7 +3192,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreatePriestHolyItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_PRIEST)
++        if (player->GetClass() != CLASS_PRIEST)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a priest!");
 +            return false;
@@ -3210,7 +3210,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreatePaladinHolyItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_PALADIN)
++        if (player->GetClass() != CLASS_PALADIN)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a paladin!");
 +            return false;
@@ -3228,7 +3228,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreatePaladinProtectionItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_PALADIN)
++        if (player->GetClass() != CLASS_PALADIN)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a paladin!");
 +            return false;
@@ -3246,7 +3246,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreatePaladinRetributionItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_PALADIN)
++        if (player->GetClass() != CLASS_PALADIN)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a paladin!");
 +            return false;
@@ -3264,7 +3264,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateWarriorFuryItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_WARRIOR)
++        if (player->GetClass() != CLASS_WARRIOR)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a warrior!");
 +            return false;
@@ -3282,7 +3282,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateWarriorArmsItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_WARRIOR)
++        if (player->GetClass() != CLASS_WARRIOR)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a warrior!");
 +            return false;
@@ -3300,7 +3300,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateWarriorProtectionItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_WARRIOR)
++        if (player->GetClass() != CLASS_WARRIOR)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a warrior!");
 +            return false;
@@ -3318,7 +3318,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateMageArcaneItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_MAGE)
++        if (player->GetClass() != CLASS_MAGE)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a mage!");
 +            return false;
@@ -3336,7 +3336,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateMageFireItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_MAGE)
++        if (player->GetClass() != CLASS_MAGE)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a mage!");
 +            return false;
@@ -3354,7 +3354,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateMageFrostItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_MAGE)
++        if (player->GetClass() != CLASS_MAGE)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a mage!");
 +            return false;
@@ -3372,7 +3372,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateWarlockAfflictionItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_WARLOCK)
++        if (player->GetClass() != CLASS_WARLOCK)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a warlock!");
 +            return false;
@@ -3390,7 +3390,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateWarlockDemonologyItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_WARLOCK)
++        if (player->GetClass() != CLASS_WARLOCK)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a warlock!");
 +            return false;
@@ -3408,7 +3408,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateWarlockDestructionItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_WARLOCK)
++        if (player->GetClass() != CLASS_WARLOCK)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a warlock!");
 +            return false;
@@ -3426,7 +3426,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateShamanElementalItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_SHAMAN)
++        if (player->GetClass() != CLASS_SHAMAN)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a shaman!");
 +            return false;
@@ -3444,7 +3444,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateShamanEnhancementItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_SHAMAN)
++        if (player->GetClass() != CLASS_SHAMAN)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a shaman!");
 +            return false;
@@ -3462,7 +3462,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateShamanRestorationItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_SHAMAN)
++        if (player->GetClass() != CLASS_SHAMAN)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a shaman!");
 +            return false;
@@ -3480,7 +3480,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateDruidBallanceItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_DRUID)
++        if (player->GetClass() != CLASS_DRUID)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a druid!");
 +            return false;
@@ -3498,7 +3498,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateDruidFeralItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_DRUID)
++        if (player->GetClass() != CLASS_DRUID)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a druid!");
 +            return false;
@@ -3516,7 +3516,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateDruidRestorationItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_DRUID)
++        if (player->GetClass() != CLASS_DRUID)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a druid!");
 +            return false;
@@ -3534,7 +3534,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateHunterMarksmanshipItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_HUNTER)
++        if (player->GetClass() != CLASS_HUNTER)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a hunter!");
 +            return false;
@@ -3552,7 +3552,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateHunterBeastmasteryItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_HUNTER)
++        if (player->GetClass() != CLASS_HUNTER)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a hunter!");
 +            return false;
@@ -3570,7 +3570,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateHunterSurvivalItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_HUNTER)
++        if (player->GetClass() != CLASS_HUNTER)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a hunter!");
 +            return false;
@@ -3588,7 +3588,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateRogueAssassinationItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_ROGUE)
++        if (player->GetClass() != CLASS_ROGUE)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a rogue!");
 +            return false;
@@ -3606,7 +3606,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateRogueCombatItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_ROGUE)
++        if (player->GetClass() != CLASS_ROGUE)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a rogue!");
 +            return false;
@@ -3624,7 +3624,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateRogueSubtletyItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_ROGUE)
++        if (player->GetClass() != CLASS_ROGUE)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a rogue!");
 +            return false;
@@ -3642,7 +3642,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateDeathKnightBloodItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_DEATH_KNIGHT)
++        if (player->GetClass() != CLASS_DEATH_KNIGHT)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a death knight!");
 +            return false;
@@ -3660,7 +3660,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateDeathKnightFrostItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_DEATH_KNIGHT)
++        if (player->GetClass() != CLASS_DEATH_KNIGHT)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a death knight!");
 +            return false;
@@ -3678,7 +3678,7 @@ index 0000000000..4ccdf38b6b
 +    static bool HandleCreateDeathKnightUnholyItemSetCommand(ChatHandler* handler, const char* args)
 +    {
 +        Player* player = handler->GetSession()->GetPlayer();
-+        if (player->getClass() != CLASS_DEATH_KNIGHT)
++        if (player->GetClass() != CLASS_DEATH_KNIGHT)
 +        {
 +            player->GetSession()->SendAreaTriggerMessage("You're not a death knight!");
 +            return false;
@@ -3700,7 +3700,7 @@ index 0000000000..4ccdf38b6b
 +
 +    static bool OnGossipHello(Player* player, Creature* creature)
 +    {
-+        switch (player->getClass())
++        switch (player->GetClass())
 +        {
 +        case CLASS_PRIEST:
 +            {
@@ -4054,7 +4054,7 @@ index 0000000000..4ccdf38b6b
 \ No newline at end of file
 diff --git a/src/server/scripts/Custom/TemplateNPC.h b/src/server/scripts/Custom/TemplateNPC.h
 new file mode 100644
-index 0000000000..86ef30748f
+index 0000000000..33eec4f947
 --- /dev/null
 +++ b/src/server/scripts/Custom/TemplateNPC.h
 @@ -0,0 +1,257 @@
@@ -4103,7 +4103,7 @@ index 0000000000..86ef30748f
 +        if (player->HasSpell(wepSkills[i]))
 +            continue;
 +
-+    switch (player->getClass())
++    switch (player->GetClass())
 +    {
 +    case CLASS_WARRIOR:
 +        player->LearnSpell(THROW_WAR, false);
@@ -4317,7 +4317,7 @@ index 0000000000..86ef30748f
 +#endif
 \ No newline at end of file
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..9f7ab5c8f2 100644
+index b6b83ac184..fd9e1489ba 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -119,7 +119,8 @@
@@ -4341,5 +4341,5 @@ index 5412cf1942..9f7ab5c8f2 100644
  // end106
  // end107
 -- 
-2.11.0
+2.20.1
 
