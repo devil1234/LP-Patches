@@ -1,11 +1,11 @@
-From b23bb92dc29fd6db939a4b26d37c163df929cb81 Mon Sep 17 00:00:00 2001
+From 127b867283c4dceb73dde53eead7e733b660acd5 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Fri, 28 Sep 2018 07:19:05 -0500
-Subject: [PATCH] 2018_09_27-Arena_Anti_Draw
+Date: Wed, 5 Feb 2020 01:58:10 -0600
+Subject: [PATCH] 2020_01_31-Arena_Anti_Draw
 
 ---
- src/server/scripts/Custom/Arena_Anti_Draw.cpp      | 51 ++++++++++++++++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |  6 ++-
+ src/server/scripts/Custom/Arena_Anti_Draw.cpp | 51 +++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |  6 ++-
  2 files changed, 55 insertions(+), 2 deletions(-)
  create mode 100644 src/server/scripts/Custom/Arena_Anti_Draw.cpp
 
@@ -68,7 +68,7 @@ index 0000000000..05a4944a47
 +}
 \ No newline at end of file
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..450b5231d3 100644
+index b6b83ac184..bf78012a82 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -112,7 +112,8 @@
@@ -92,5 +92,5 @@ index 5412cf1942..450b5231d3 100644
  // end99
  // end100
 -- 
-2.11.0
+2.20.1
 
