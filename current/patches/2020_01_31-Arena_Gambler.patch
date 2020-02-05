@@ -1,15 +1,15 @@
-From d5dce4ac5b58b938d438972fb308400b3a0b756d Mon Sep 17 00:00:00 2001
+From 5e26b91ab0ea8382559711ba0e0d45aa712a5ef7 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Fri, 28 Sep 2018 08:22:50 -0500
-Subject: [PATCH] 2018_09_27-Arena_Gambler
+Date: Wed, 5 Feb 2020 02:22:09 -0600
+Subject: [PATCH] 2020_01_31-Arena_Gambler
 
 ---
- .../characters/characters.arenagambler.sql         |  63 ++
- sql/LordPsyan-Patches/world/world.arenagambler.sql | 318 +++++++++
- src/server/scripts/Custom/ArenaGambler.cpp         | 348 ++++++++++
- src/server/scripts/Custom/ArenaGamblingSystem.cpp  | 723 +++++++++++++++++++++
- src/server/scripts/Custom/ArenaGamblingSystem.h    | 474 ++++++++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |   6 +-
+ .../characters/characters.arenagambler.sql    |  63 ++
+ .../world/world.arenagambler.sql              | 318 ++++++++
+ src/server/scripts/Custom/ArenaGambler.cpp    | 348 +++++++++
+ .../scripts/Custom/ArenaGamblingSystem.cpp    | 723 ++++++++++++++++++
+ .../scripts/Custom/ArenaGamblingSystem.h      | 474 ++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |   6 +-
  6 files changed, 1930 insertions(+), 2 deletions(-)
  create mode 100644 sql/LordPsyan-Patches/characters/characters.arenagambler.sql
  create mode 100644 sql/LordPsyan-Patches/world/world.arenagambler.sql
@@ -412,7 +412,7 @@ index 0000000000..78839cf943
 +(194608,5,8618,'Undercity Banner','','','',1,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'','',1);
 diff --git a/src/server/scripts/Custom/ArenaGambler.cpp b/src/server/scripts/Custom/ArenaGambler.cpp
 new file mode 100644
-index 0000000000..1dacc602a0
+index 0000000000..60d6f14be4
 --- /dev/null
 +++ b/src/server/scripts/Custom/ArenaGambler.cpp
 @@ -0,0 +1,348 @@
@@ -636,7 +636,7 @@ index 0000000000..1dacc602a0
 +                            }
 +                            // Reason is: your level is smaller than the minimum level required
 +                            uint32 m_minRequiredLevel = 0;
-+                            if(pPlayer->getLevel() <= m_minRequiredLevel || pDefender->getLevel() <= m_minRequiredLevel )
++                            if(pPlayer->GetLevel() <= m_minRequiredLevel || pDefender->GetLevel() <= m_minRequiredLevel )
 +                            {
 +                            ChatHandler(pPlayer->GetSession()).PSendSysMessage(ARENA_GAMBLER_MSG_LOW_LEVEL);
 +                            }
@@ -644,13 +644,13 @@ index 0000000000..1dacc602a0
 +                            ChatHandler(pPlayer->GetSession()).PSendSysMessage(ARENA_GAMBLER_MSG_LOW_LEVEL);
 +                            // Reason is: level diffrance is too high
 +                            uint32 levelDiff = 0;
-+                            if(pPlayer->getLevel() > pDefender->getLevel())
++                            if(pPlayer->GetLevel() > pDefender->GetLevel())
 +                            {
-+                                levelDiff = pPlayer->getLevel() - pDefender->getLevel();
++                                levelDiff = pPlayer->GetLevel() - pDefender->GetLevel();
 +                            }
 +                            else
 +                            {
-+                                levelDiff = pDefender->getLevel() - pPlayer->getLevel();
++                                levelDiff = pDefender->GetLevel() - pPlayer->GetLevel();
 +                            }
 +                            return true;
 +                        }
@@ -767,7 +767,7 @@ index 0000000000..1dacc602a0
 \ No newline at end of file
 diff --git a/src/server/scripts/Custom/ArenaGamblingSystem.cpp b/src/server/scripts/Custom/ArenaGamblingSystem.cpp
 new file mode 100644
-index 0000000000..cb80425e58
+index 0000000000..e1308c8662
 --- /dev/null
 +++ b/src/server/scripts/Custom/ArenaGamblingSystem.cpp
 @@ -0,0 +1,723 @@
@@ -989,15 +989,15 @@ index 0000000000..cb80425e58
 +
 +    // No dueling if you don't meet the level requirement in the database
 +    uint32 m_minRequiredLevel = 0;
-+    if(pChallenger->getLevel() <= m_minRequiredLevel || pDefender->getLevel() <= m_minRequiredLevel)
++    if(pChallenger->GetLevel() <= m_minRequiredLevel || pDefender->GetLevel() <= m_minRequiredLevel)
 +        return false;
 +
 +    // No dueling if your level differance is bigger than specified in the database
 +    uint32 levelDiff = 0;
-+    if(pChallenger->getLevel() > pDefender->getLevel())
-+        levelDiff = pChallenger->getLevel() - pDefender->getLevel();
++    if(pChallenger->GetLevel() > pDefender->GetLevel())
++        levelDiff = pChallenger->GetLevel() - pDefender->GetLevel();
 +    else
-+        levelDiff = pDefender->getLevel() - pChallenger->getLevel();
++        levelDiff = pDefender->GetLevel() - pChallenger->GetLevel();
 +    if(levelDiff > m_maxLevelDiff)
 +        return false;
 +
@@ -1138,7 +1138,7 @@ index 0000000000..cb80425e58
 +        else
 +            secondPlayer = ObjectAccessor::FindPlayer(ObjectGuid(HighGuid::Player, matchData->GetChallengerGUID()));
 +        if(secondPlayer)
-+            secondPlayer->GetSession()->SendAreaTriggerMessage("|cffffffffThe player |cff00ccff%s |cffffffffhas bet |cff00ccff%u|cffffffffx of the item |%s|Hitem:%u:0:0:0:0:0:0:0:%u|h[%s]|h|r", pPlayer, amount, GetQualityColor(itemProto->Quality).c_str(),  pItem->GetEntry(), pPlayer->getLevel(),  itemProto->Name1.c_str());
++            secondPlayer->GetSession()->SendAreaTriggerMessage("|cffffffffThe player |cff00ccff%s |cffffffffhas bet |cff00ccff%u|cffffffffx of the item |%s|Hitem:%u:0:0:0:0:0:0:0:%u|h[%s]|h|r", pPlayer, amount, GetQualityColor(itemProto->Quality).c_str(),  pItem->GetEntry(), pPlayer->GetLevel(),  itemProto->Name1.c_str());
 +        return true;
 +    }
 +    return false;
@@ -1977,7 +1977,7 @@ index 0000000000..7fc60c02e4
 +#endif
 \ No newline at end of file
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..5b4e96e6cb 100644
+index b6b83ac184..b36f414de2 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -49,7 +49,8 @@
@@ -2001,5 +2001,5 @@ index 5412cf1942..5b4e96e6cb 100644
  // end36
  // end37
 -- 
-2.11.0
+2.20.1
 
