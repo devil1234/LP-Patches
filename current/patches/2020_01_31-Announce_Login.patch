@@ -1,11 +1,11 @@
-From c68f7c2837be0bd6af7b831706ac1414aecb206c Mon Sep 17 00:00:00 2001
+From fc8f938592ae1b314bdebc7ec9027f17ed313b87 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Fri, 28 Sep 2018 06:29:51 -0500
-Subject: [PATCH] 2018_09_27-Announce_Login
+Date: Wed, 5 Feb 2020 00:43:30 -0600
+Subject: [PATCH] 2020_01_31-Announce_Login
 
 ---
- src/server/scripts/Custom/announce_login.cpp       | 27 ++++++++++++++++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |  6 +++--
+ src/server/scripts/Custom/announce_login.cpp  | 27 +++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |  6 +++--
  2 files changed, 31 insertions(+), 2 deletions(-)
  create mode 100644 src/server/scripts/Custom/announce_login.cpp
 
@@ -44,7 +44,7 @@ index 0000000000..6ba9881c11
 +}
 \ No newline at end of file
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..e32a8aee1e 100644
+index b6b83ac184..662a78da2a 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -108,7 +108,8 @@
@@ -68,5 +68,5 @@ index 5412cf1942..e32a8aee1e 100644
  // end95
  // end96
 -- 
-2.11.0
+2.20.1
 
