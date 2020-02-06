@@ -1,27 +1,30 @@
-From 235804d9fb4cfd4b44aaa2d9c014a1040adc65ae Mon Sep 17 00:00:00 2001
+From 4c313c3648d011bd86df060fe2051271696f619e Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Fri, 28 Sep 2018 20:32:14 -0500
-Subject: [PATCH] 2018_09_27-AutoLearnSpells
+Date: Thu, 6 Feb 2020 14:20:24 -0600
+Subject: [PATCH] 2020_01_31-AutoLearnSpells
 
 ---
- src/server/scripts/Custom/LearnSpells.cpp          | 150 +++++++++++++++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |   6 +-
- 2 files changed, 154 insertions(+), 2 deletions(-)
+ src/server/scripts/Custom/LearnSpells.cpp     | 161 ++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |   6 +-
+ src/server/worldserver/worldserver.conf.dist  |  11 ++
+ 3 files changed, 176 insertions(+), 2 deletions(-)
  create mode 100644 src/server/scripts/Custom/LearnSpells.cpp
 
 diff --git a/src/server/scripts/Custom/LearnSpells.cpp b/src/server/scripts/Custom/LearnSpells.cpp
 new file mode 100644
-index 0000000000..6c008a9212
+index 0000000000..a46daddabd
 --- /dev/null
 +++ b/src/server/scripts/Custom/LearnSpells.cpp
-@@ -0,0 +1,150 @@
+@@ -0,0 +1,161 @@
 +#include "DisableMgr.h"
 +#include "SpellMgr.h"
 +#include "Spell.h"
 +#include "DBCStores.h"
++#include "LordPsyan.h"
 +
 +class LearnSpellsOnLevelUp : public PlayerScript
 +{
++
 +        public:
 +                std::vector<uint32> ignoreSpells;
 +
@@ -65,24 +68,32 @@ index 0000000000..6c008a9212
 +
 +        void OnLevelChanged(Player* player, uint8 oldLevel)
 +        {
-+                if (oldLevel < player->getLevel())
++			if(sConfigMgr->GetBoolDefault("AutoLearn.Spells", false))
++{
++                if (oldLevel < player->GetLevel())
 +                        LearnSpellsForNewLevel(player, oldLevel);
++}
 +        }
 +
 +        bool IsIgnoredSpell(uint32 spellID)
 +        {
++			if(sConfigMgr->GetBoolDefault("AutoLearn.Spells", false))
++{
 +                for (std::vector<uint32>::const_iterator itr = ignoreSpells.begin(); itr != ignoreSpells.end(); ++itr)
 +                        if (spellID == (*itr))
 +                                return true;
 +                return false;
++}
 +        }
 +
 +        void LearnSpellsForNewLevel(Player* player, uint8 level)
 +        {
-+                if (level == player->getLevel() + 1)
++			if(sConfigMgr->GetBoolDefault("AutoLearn.Spells", false))
++{
++                if (level == player->GetLevel() + 1)
 +                        return;
 +                uint32 family;
-+                switch(player->getClass())
++                switch(player->GetClass())
 +                {
 +                        case CLASS_ROGUE:
 +                                family = SPELLFAMILY_ROGUE;
@@ -158,6 +169,7 @@ index 0000000000..6c008a9212
 +                                player->LearnSpell(spellInfo->Id, false);
 +                }
 +                LearnSpellsForNewLevel(player, ++level);
++}
 +        }
 +};
 +
@@ -165,9 +177,8 @@ index 0000000000..6c008a9212
 +{
 +        new LearnSpellsOnLevelUp();
 +}
-\ No newline at end of file
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..37c0230ceb 100644
+index b6b83ac184..b85c806eb5 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -133,7 +133,8 @@
@@ -190,6 +201,28 @@ index 5412cf1942..37c0230ceb 100644
  // end119
  // end120
  // end121
+diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
+index afa4fcccce..d28618c43d 100644
+--- a/src/server/worldserver/worldserver.conf.dist
++++ b/src/server/worldserver/worldserver.conf.dist
+@@ -4093,6 +4093,17 @@ Metric.ConnectionInfo = "127.0.0.1;8086;worldserver"
+ 
+ Metric.OverallStatusInterval = 1
+ 
++###################################################################################################
++#
++# AutoLearn Configuration#
++# AutoLearn Spells on Level
++#                 = 0 (Disabled)
++#         default = 1 (Enabled)
++
++AutoLearn.Spells = 1
++
++#
++
+ #
+ ###################################################################################################
+ 
 -- 
-2.11.0
+2.20.1
 
