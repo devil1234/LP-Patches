@@ -1,0 +1,178 @@
+From 04e52ba7bef81fa47fcde570cf80a4f6ed31bf14 Mon Sep 17 00:00:00 2001
+From: LordPsyan <lordpsyan@gmail.com>
+Date: Tue, 11 Feb 2020 11:06:11 -0600
+Subject: [PATCH] 2020_01_31-Fast_Arena_Start
+
+---
+ .../game/Battlegrounds/Battleground.cpp       | 57 +++++++++++++++++++
+ src/server/game/Battlegrounds/Battleground.h  |  6 ++
+ .../scripts/Custom/arena_fast_start.cpp       | 41 +++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |  4 +-
+ 4 files changed, 106 insertions(+), 2 deletions(-)
+ create mode 100644 src/server/scripts/Custom/arena_fast_start.cpp
+
+diff --git a/src/server/game/Battlegrounds/Battleground.cpp b/src/server/game/Battlegrounds/Battleground.cpp
+index 8752f483af..aab50c302d 100644
+--- a/src/server/game/Battlegrounds/Battleground.cpp
++++ b/src/server/game/Battlegrounds/Battleground.cpp
+@@ -1791,6 +1791,63 @@ void Battleground::HandleAreaTrigger(Player* player, uint32 trigger)
+                    trigger, player->GetMapId(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+ }
+ 
++uint8 Battleground::ClickFastStart(Player *player, GameObject *go)
++{
++    if (!isArena())
++        return 0;
++
++    std::set<uint64>::iterator pIt = m_playersWantsFastStart.find(player->GetGUID());
++    if (pIt != m_playersWantsFastStart.end() || GetStartDelayTime() < BG_START_DELAY_15S/* || player->isSpectator()*/)
++        return m_playersWantsFastStart.size();
++
++    m_playersWantsFastStart.insert(player->GetGUID());
++
++    std::set<GameObject*>::iterator goIt = m_crystals.find(go);
++    if (goIt == m_crystals.end())
++        m_crystals.insert(go);
++
++    uint8 playersNeeded = 0;
++    switch(GetArenaType())
++    {
++        case ARENA_TYPE_2v2:
++            playersNeeded = 4;
++            break;
++        case ARENA_TYPE_3v3:
++            playersNeeded = 6;
++            break;
++        case ARENA_TYPE_5v5:
++            playersNeeded = 10;
++            break;
++    }
++
++    if (sBattlegroundMgr->isTesting() && isArena())
++       playersNeeded = 2;
++
++    if (m_playersWantsFastStart.size() == playersNeeded)
++    {
++        DespawnCrystals();
++        if (GetStartDelayTime() > BG_START_DELAY_15S)
++            SetStartDelayTime(BG_START_DELAY_15S);
++        else
++            DespawnCrystals();
++    }
++
++    return m_playersWantsFastStart.size();
++}
++
++void Battleground::DespawnCrystals()
++{
++    if (m_crystals.empty())
++        return;
++
++    for (std::set<GameObject*>::iterator itr = m_crystals.begin(); itr != m_crystals.end(); ++itr)
++    {
++        GameObject *go = *itr;
++        go->Delete();
++        m_crystals.erase(itr);
++    }
++}
++
+ bool Battleground::CheckAchievementCriteriaMeet(uint32 criteriaId, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/)
+ {
+     TC_LOG_ERROR("bg.battleground", "Battleground::CheckAchievementCriteriaMeet: No implementation for criteria %u", criteriaId);
+diff --git a/src/server/game/Battlegrounds/Battleground.h b/src/server/game/Battlegrounds/Battleground.h
+index a4af193dc4..8982441039 100644
+--- a/src/server/game/Battlegrounds/Battleground.h
++++ b/src/server/game/Battlegrounds/Battleground.h
+@@ -491,6 +491,9 @@ class TC_GAME_API Battleground
+ 
+         virtual uint32 GetPrematureWinner();
+ 
++        uint8 ClickFastStart(Player *player, GameObject *go);
++        void DespawnCrystals();
++
+         // because BattleGrounds with different types and same level range has different m_BracketId
+         uint8 GetUniqueBracketId() const;
+ 
+@@ -559,6 +562,9 @@ class TC_GAME_API Battleground
+         uint32 m_PrematureCountDownTimer;
+         std::string m_Name;
+ 
++        std::set<uint64> m_playersWantsFastStart;
++        std::set<GameObject*> m_crystals;
++
+         /* Pre- and post-update hooks */
+ 
+         /**
+diff --git a/src/server/scripts/Custom/arena_fast_start.cpp b/src/server/scripts/Custom/arena_fast_start.cpp
+new file mode 100644
+index 0000000000..02ecc1f042
+--- /dev/null
++++ b/src/server/scripts/Custom/arena_fast_start.cpp
+@@ -0,0 +1,41 @@
++﻿#include "ScriptPCH.h"
++#include "Player.h"
++#include "Battleground.h"
++#include "BattlegroundMgr.h"
++#include "LordPsyan.h"
++#include "GameObject.h"
++#include "GameObjectAI.h"
++#include "GameTime.h"
++#include <sstream> 
++
++class fast_arena_start : public GameObjectScript
++{
++    public:
++        fast_arena_start() : GameObjectScript("fast_arena_start") { }
++
++    struct fast_arena_startAI : public GameObjectAI
++    {
++        fast_arena_startAI(GameObject* go) : GameObjectAI(go)
++        {
++
++        }
++
++        static bool OnGossipHello(Player* player, GameObject* go)
++        {
++            if (Battleground *bg = player->GetBattleground())
++                if (bg->isArena())
++                    ChatHandler(player->GetSession()).PSendSysMessage("Игроки нажали: %u", bg->ClickFastStart(player, go));
++
++            return false;
++        }
++    };
++    GameObjectAI* GetAI(GameObject* go) const override
++    {
++        return new fast_arena_startAI(go);
++    }
++};
++
++void AddSC_fast_arena_start()
++{
++    new fast_arena_start();
++}
+\ No newline at end of file
+diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
+index b6b83ac184..94006eebb6 100644
+--- a/src/server/scripts/Custom/custom_script_loader.cpp
++++ b/src/server/scripts/Custom/custom_script_loader.cpp
+@@ -90,7 +90,7 @@
+ // start72
+ // start73
+ // start74
+-// start75
++void AddSC_fast_arena_start();
+ // start76
+ // start77
+ // start78
+@@ -295,7 +295,7 @@ void AddCustomScripts()
+ // end72
+ // end73
+ // end74
+-// end75
++    AddSC_fast_arena_start();
+ // end76
+ // end77
+ // end78
+-- 
+2.20.1
+
