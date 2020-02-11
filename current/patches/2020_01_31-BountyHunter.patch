@@ -1,13 +1,13 @@
-From 498ce015b4f829d744e4ed0cdc444a4de2652030 Mon Sep 17 00:00:00 2001
+From bd340afad0dd9cbbb5706979d986d5fd9b4e79cf Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Sat, 29 Sep 2018 03:10:10 -0500
-Subject: [PATCH] 2018_09_27-BountyHunter
+Date: Tue, 11 Feb 2020 09:52:08 -0600
+Subject: [PATCH] 2020_01_31-BountyHunter
 
 ---
- .../characters/characters.BountyHunter.sql         |  38 ++
- sql/LordPsyan-Patches/world/world.BountyHunter.sql |   5 +
- src/server/scripts/Custom/bountyhunter.cpp         | 490 +++++++++++++++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |   6 +-
+ .../characters/characters.BountyHunter.sql    |  38 ++
+ .../world/world.BountyHunter.sql              |   5 +
+ src/server/scripts/Custom/bountyhunter.cpp    | 490 ++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |   6 +-
  4 files changed, 537 insertions(+), 2 deletions(-)
  create mode 100644 sql/LordPsyan-Patches/characters/characters.BountyHunter.sql
  create mode 100644 sql/LordPsyan-Patches/world/world.BountyHunter.sql
@@ -70,7 +70,7 @@ index 0000000000..94238f24be
 +('99014','0','0','0','0','0','24818','3422','24819','24821','George','Bounty Hunter','','0','80','80','0','35','1','1','1.14286','1','0','0','0','0','1','1','1','0','0','0','0','0','0','0','0','7','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','','0','1','5','1','1','1','1','0','0','1','0','0','BountyHunter','1');
 diff --git a/src/server/scripts/Custom/bountyhunter.cpp b/src/server/scripts/Custom/bountyhunter.cpp
 new file mode 100644
-index 0000000000..744a3cd702
+index 0000000000..4ff34b811f
 --- /dev/null
 +++ b/src/server/scripts/Custom/bountyhunter.cpp
 @@ -0,0 +1,490 @@
@@ -488,8 +488,8 @@ index 0000000000..744a3cd702
 +
 +        void OnPVPKill(Player * Killer, Player * Bounty)
 +        {
-+        int32 KillerLevel = Killer->getLevel(); //Get Killer Level
-+        int32 BountyLevel = Bounty->getLevel(); //Get Bounty Level
++        int32 KillerLevel = Killer->GetLevel(); //Get Killer Level
++        int32 BountyLevel = Bounty->GetLevel(); //Get Bounty Level
 +        int32 LevelDif = std::abs(KillerLevel - BountyLevel);
 +            if(Killer->GetGUID() == Bounty->GetGUID())
 +                return;
@@ -565,7 +565,7 @@ index 0000000000..744a3cd702
 +    new BountyKills();
 +}
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..cd0733028d 100644
+index b6b83ac184..dc5d8f60c4 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -24,7 +24,8 @@
@@ -589,5 +589,5 @@ index 5412cf1942..cd0733028d 100644
  // end11
  // end12
 -- 
-2.11.0
+2.20.1
 
