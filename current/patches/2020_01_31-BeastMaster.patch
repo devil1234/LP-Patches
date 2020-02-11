@@ -1,13 +1,13 @@
-From 73767b53d9a1803ebe1a24f4cddcc954550c6226 Mon Sep 17 00:00:00 2001
+From b1b63cdbcb14755585b14d4d0322c37f4c61e4eb Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Fri, 28 Sep 2018 21:55:28 -0500
-Subject: [PATCH] 2018_09_27-BeastMaster
+Date: Tue, 11 Feb 2020 00:00:28 -0600
+Subject: [PATCH] 2020_01_31-BeastMaster
 
 ---
- sql/LordPsyan-Patches/world/world.beastmaster.sql  |  65 ++++
- src/server/scripts/Custom/beastmaster.cpp          | 421 +++++++++++++++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |   6 +-
- src/server/worldserver/worldserver.conf.dist       |  29 ++
+ .../world/world.beastmaster.sql               |  65 +++
+ src/server/scripts/Custom/beastmaster.cpp     | 421 ++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |   6 +-
+ src/server/worldserver/worldserver.conf.dist  |  29 ++
  4 files changed, 519 insertions(+), 2 deletions(-)
  create mode 100644 sql/LordPsyan-Patches/world/world.beastmaster.sql
  create mode 100644 src/server/scripts/Custom/beastmaster.cpp
@@ -85,7 +85,7 @@ index 0000000000..844e1a7adc
 +('99990','0','4542','0','0','0');
 diff --git a/src/server/scripts/Custom/beastmaster.cpp b/src/server/scripts/Custom/beastmaster.cpp
 new file mode 100644
-index 0000000000..96b8122f42
+index 0000000000..36a23972a7
 --- /dev/null
 +++ b/src/server/scripts/Custom/beastmaster.cpp
 @@ -0,0 +1,421 @@
@@ -108,7 +108,7 @@ index 0000000000..96b8122f42
 +
 +    if(sConfigMgr->GetBoolDefault("BeastMaster.OnlyHunter", false)) // Checks to see if Only Hunters can have pets.
 +     {
-+        if(player->getClass() != CLASS_HUNTER) {
++        if(player->GetClass() != CLASS_HUNTER) {
 +            m_creature->Whisper("You are not a Hunter!", LANG_UNIVERSAL, player);
 +            return;
 +        }
@@ -134,12 +134,12 @@ index 0000000000..96b8122f42
 +    pet->SetPower(POWER_HAPPINESS, 1048000);
 +
 +    // prepare visual effect for levelup
-+    pet->SetUInt32Value(UNIT_FIELD_LEVEL, player->getLevel() - 1);
++    pet->SetUInt32Value(UNIT_FIELD_LEVEL, player->GetLevel() - 1);
 +    pet->GetMap()->AddToMap((Creature*)pet);
 +        // visual effect for levelup
-+    pet->SetUInt32Value(UNIT_FIELD_LEVEL, player->getLevel());
++    pet->SetUInt32Value(UNIT_FIELD_LEVEL, player->GetLevel());
 +
-+    if(!pet->InitStatsForLevel(player->getLevel()))
++    if(!pet->InitStatsForLevel(player->GetLevel()))
 +        TC_LOG_ERROR("scripts", "Pet Create fail: no init stats for entry %u", entry);
 +        pet->UpdateAllStats();
 +
@@ -511,7 +511,7 @@ index 0000000000..96b8122f42
 +    new Npc_Beastmaster();
 +}
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..e7599e6f06 100644
+index b6b83ac184..a693879074 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -20,7 +20,8 @@
@@ -535,10 +535,10 @@ index 5412cf1942..e7599e6f06 100644
  // end07
  // end08
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index 6ee9e3158c..2ad0710a98 100644
+index afa4fcccce..61f637abe9 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -4016,6 +4016,35 @@ Metric.OverallStatusInterval = 1
+@@ -4096,6 +4096,35 @@ Metric.OverallStatusInterval = 1
  #
  ###################################################################################################
  
@@ -575,5 +575,5 @@ index 6ee9e3158c..2ad0710a98 100644
  # Prepatch by LordPsyan.
  # See http://www.realmsofwarcraft.com/bb for forums and information.
 -- 
-2.11.0
+2.20.1
 
