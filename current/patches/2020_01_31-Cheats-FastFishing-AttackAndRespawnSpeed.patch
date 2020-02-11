@@ -1,24 +1,24 @@
-From 829e1b594ad55599e2ccc28abb990b1466bed250 Mon Sep 17 00:00:00 2001
+From c795ec0f113ec941493143b23083e3c7b3fed7d4 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Sat, 29 Sep 2018 12:26:40 -0500
-Subject: [PATCH] 2018_09_27-Cheats-FastFishing-AttackAndRespawnSpeed
+Date: Tue, 11 Feb 2020 11:49:57 -0600
+Subject: [PATCH] 2020_01_31-Cheats-FastFishing-AttackAndRespawnSpeed
 
 ---
- src/server/game/Entities/Creature/Creature.cpp |  2 +-
- src/server/game/Entities/Player/Player.cpp     | 14 +++--
- src/server/game/Entities/Unit/Unit.cpp         |  9 +++-
- src/server/game/Spells/SpellEffects.cpp        |  3 ++
- src/server/game/Spells/SpellInfo.cpp           |  6 ++-
- src/server/game/World/World.cpp                |  8 ++-
- src/server/game/World/World.h                  | 11 ++--
- src/server/worldserver/worldserver.conf.dist   | 74 ++++++++++++++++++++++++++
+ .../game/Entities/Creature/Creature.cpp       |  2 +-
+ src/server/game/Entities/Player/Player.cpp    | 14 +++-
+ src/server/game/Entities/Unit/Unit.cpp        |  9 ++-
+ src/server/game/Spells/SpellEffects.cpp       |  3 +
+ src/server/game/Spells/SpellInfo.cpp          |  6 +-
+ src/server/game/World/World.cpp               |  8 +-
+ src/server/game/World/World.h                 | 11 ++-
+ src/server/worldserver/worldserver.conf.dist  | 74 +++++++++++++++++++
  8 files changed, 115 insertions(+), 12 deletions(-)
 
 diff --git a/src/server/game/Entities/Creature/Creature.cpp b/src/server/game/Entities/Creature/Creature.cpp
-index 7cbb2e3d2b..01681a1f3a 100644
+index 9b90fe95b3..76830c5e41 100644
 --- a/src/server/game/Entities/Creature/Creature.cpp
 +++ b/src/server/game/Entities/Creature/Creature.cpp
-@@ -1911,7 +1911,7 @@ void Creature::setDeathState(DeathState s)
+@@ -1933,7 +1933,7 @@ void Creature::setDeathState(DeathState s)
              if (IsDungeonBoss() && !m_respawnDelay)
                  m_respawnTime = std::numeric_limits<time_t>::max(); // never respawn in this instance
              else
@@ -28,7 +28,7 @@ index 7cbb2e3d2b..01681a1f3a 100644
          else
          {
 diff --git a/src/server/game/Entities/Player/Player.cpp b/src/server/game/Entities/Player/Player.cpp
-index 467fb9f23b..35625d3247 100644
+index 30444f2f2f..572ca705fe 100644
 --- a/src/server/game/Entities/Player/Player.cpp
 +++ b/src/server/game/Entities/Player/Player.cpp
 @@ -1164,7 +1164,10 @@ void Player::Update(uint32 p_time)
@@ -43,7 +43,7 @@ index 467fb9f23b..35625d3247 100644
                  }
              }
  
-@@ -22594,10 +22597,13 @@ void Player::SendInitialPacketsBeforeAddToMap()
+@@ -22743,10 +22746,13 @@ void Player::SendInitialPacketsBeforeAddToMap()
  
      SendEquipmentSetList();
  
@@ -61,10 +61,10 @@ index 467fb9f23b..35625d3247 100644
  
      GetReputationMgr().SendForceReactions();                // SMSG_SET_FORCED_REACTIONS
 diff --git a/src/server/game/Entities/Unit/Unit.cpp b/src/server/game/Entities/Unit/Unit.cpp
-index 45a9d4b35d..bcf185f44c 100644
+index 7640d6ece0..2a7db8f222 100644
 --- a/src/server/game/Entities/Unit/Unit.cpp
 +++ b/src/server/game/Entities/Unit/Unit.cpp
-@@ -520,7 +520,14 @@ void Unit::DisableSpline()
+@@ -546,7 +546,14 @@ void Unit::DisableSpline()
  
  void Unit::resetAttackTimer(WeaponAttackType type)
  {
@@ -81,21 +81,21 @@ index 45a9d4b35d..bcf185f44c 100644
  
  bool Unit::IsWithinCombatRange(Unit const* obj, float dist2compare) const
 diff --git a/src/server/game/Spells/SpellEffects.cpp b/src/server/game/Spells/SpellEffects.cpp
-index fdb3084d24..0420576dcf 100644
+index 25bd7aa0d6..ed9bbe6746 100644
 --- a/src/server/game/Spells/SpellEffects.cpp
 +++ b/src/server/game/Spells/SpellEffects.cpp
-@@ -5081,6 +5081,9 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
-                 case 3: lastSec = 17; break;
+@@ -4695,6 +4695,9 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
+                 case 2: lastSec = 13; break;
              }
  
 +            if (sWorld->getBoolConfig(CONFIG_FAST_FISHING))
 +                lastSec = 17;
 +
-             duration = duration - lastSec*IN_MILLISECONDS + FISHING_BOBBER_READY_TIME*IN_MILLISECONDS;
+             // Duration of the fishing bobber can't be higher than the Fishing channeling duration
+             duration = std::min(duration, duration - lastSec*IN_MILLISECONDS + FISHING_BOBBER_READY_TIME*IN_MILLISECONDS);
              break;
-         }
 diff --git a/src/server/game/Spells/SpellInfo.cpp b/src/server/game/Spells/SpellInfo.cpp
-index 6750341446..1eacd12baf 100644
+index 3a0e858cd2..a1c5b3ea94 100644
 --- a/src/server/game/Spells/SpellInfo.cpp
 +++ b/src/server/game/Spells/SpellInfo.cpp
 @@ -30,6 +30,7 @@
@@ -119,10 +119,10 @@ index 6750341446..1eacd12baf 100644
  
  uint32 SpellInfo::GetMaxTicks() const
 diff --git a/src/server/game/World/World.cpp b/src/server/game/World/World.cpp
-index 82dbe507d3..2cf6059ece 100644
+index 86c38d6aa4..b5c25754fe 100644
 --- a/src/server/game/World/World.cpp
 +++ b/src/server/game/World/World.cpp
-@@ -1527,7 +1527,13 @@ void World::LoadConfigSettings(bool reload)
+@@ -1566,7 +1566,13 @@ void World::LoadConfigSettings(bool reload)
      // Prepatch by LordPsyan
      // 41
      // 42
@@ -138,10 +138,10 @@ index 82dbe507d3..2cf6059ece 100644
      // 45
      // 46
 diff --git a/src/server/game/World/World.h b/src/server/game/World/World.h
-index c0cb58fc77..501e79b965 100644
+index 975cd0d06f..6927cd5f74 100644
 --- a/src/server/game/World/World.h
 +++ b/src/server/game/World/World.h
-@@ -165,7 +165,9 @@ enum WorldBoolConfigs
+@@ -163,7 +163,9 @@ enum WorldBoolConfigs
      // Prepatch by LordPsyan
      // 01
      // 02
@@ -152,7 +152,7 @@ index c0cb58fc77..501e79b965 100644
      // 04
      // 05
      // 06
-@@ -251,15 +253,16 @@ enum WorldFloatConfigs
+@@ -249,15 +251,16 @@ enum WorldFloatConfigs
      // Prepatch by LordPsyan
      // 41
      // 42
@@ -173,10 +173,10 @@ index c0cb58fc77..501e79b965 100644
      // 53
      // 54
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index 6ee9e3158c..06255af5d1 100644
+index afa4fcccce..c53a6dc20f 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -4016,6 +4016,80 @@ Metric.OverallStatusInterval = 1
+@@ -4096,6 +4096,80 @@ Metric.OverallStatusInterval = 1
  #
  ###################################################################################################
  
@@ -258,5 +258,5 @@ index 6ee9e3158c..06255af5d1 100644
  # Prepatch by LordPsyan.
  # See http://www.realmsofwarcraft.com/bb for forums and information.
 -- 
-2.11.0
+2.20.1
 
