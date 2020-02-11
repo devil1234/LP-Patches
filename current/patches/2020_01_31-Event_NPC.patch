@@ -1,12 +1,12 @@
-From 537a70774210a590b89f2bc55d80dce60dc257cb Mon Sep 17 00:00:00 2001
+From 05f9beb39c3810dd7359b50424c20cdbbbfe5865 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Sat, 29 Sep 2018 16:36:57 -0500
-Subject: [PATCH] 2018_09_27-Event_NPC
+Date: Tue, 11 Feb 2020 14:20:24 -0600
+Subject: [PATCH] 2020_01_31-Event_NPC
 
 ---
- sql/LordPsyan-Patches/world/world.event_npc.sql    |   27 +
- src/server/scripts/Custom/custom_script_loader.cpp |    6 +-
- src/server/scripts/Custom/event_npc.cpp            | 1306 ++++++++++++++++++++
+ .../world/world.event_npc.sql                 |   27 +
+ .../scripts/Custom/custom_script_loader.cpp   |    6 +-
+ src/server/scripts/Custom/event_npc.cpp       | 1306 +++++++++++++++++
  3 files changed, 1337 insertions(+), 2 deletions(-)
  create mode 100644 sql/LordPsyan-Patches/world/world.event_npc.sql
  create mode 100644 src/server/scripts/Custom/event_npc.cpp
@@ -45,7 +45,7 @@ index 0000000000..3a42247d9a
 +INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entry_2`, `difficulty_entry_3`, `KillCredit1`, `KillCredit2`, `modelid1`, `modelid2`, `modelid3`, `modelid4`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `scale`, `rank`, `dmgschool`, `BaseAttackTime`, `RangeAttackTime`, `BaseVariance`, `RangeVariance`, `unit_class`, `unit_flags`, `unit_flags2`, `dynamicflags`, `family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `spell1`, `spell2`, `spell3`, `spell4`, `spell5`, `spell6`, `spell7`, `spell8`, `PetSpellDataId`, `VehicleId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `HoverHeight`, `HealthModifier`, `ManaModifier`, `ArmorModifier`, `DamageModifier`, `ExperienceModifier`, `RacialLeader`, `movementId`, `RegenHealth`, `mechanic_immune_mask`, `flags_extra`, `ScriptName`, `VerifiedBuild`) VALUES
 +('60013','0','0','0','0','0','24818','3422','24819','24821','Warrior','Event NPC','','0','80','80','0','16','1','1','1.14286','1','0','0','0','0','1','1','1','0','0','0','0','0','0','0','0','7','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','','0','1','5','1','1','1','1','0','0','1','0','0','event_warrior','1');
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..3d1a1f1d38 100644
+index b6b83ac184..044556138d 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -209,7 +209,8 @@
@@ -1381,5 +1381,5 @@ index 0000000000..0f6c0f3810
 +
 +// © gmlt.A [worldofwarcraft.by]
 -- 
-2.11.0
+2.20.1
 
