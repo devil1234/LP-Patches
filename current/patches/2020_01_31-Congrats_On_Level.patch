@@ -1,13 +1,13 @@
-From 68713972a7c5f3d349c3d871490def08d3c0db54 Mon Sep 17 00:00:00 2001
+From 7b70fe1d53fde803b89b17eb19978040705969cf Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Sat, 29 Sep 2018 12:30:34 -0500
-Subject: [PATCH] 2018_09_27-Congrats_On_Level
+Date: Tue, 11 Feb 2020 12:12:21 -0600
+Subject: [PATCH] 2020_01_31-Congrats_On_Level
 
 ---
- HowTo-Congrats-On-Level.txt                        |  38 +++
- .../world/world.congrats_on_level.sql              |  28 ++
- src/server/scripts/Custom/Congrats_on_Level.cpp    | 283 +++++++++++++++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |   6 +-
+ HowTo-Congrats-On-Level.txt                   |  38 +++
+ .../world/world.congrats_on_level.sql         |  28 ++
+ .../scripts/Custom/Congrats_on_Level.cpp      | 283 ++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |   6 +-
  4 files changed, 353 insertions(+), 2 deletions(-)
  create mode 100644 HowTo-Congrats-On-Level.txt
  create mode 100644 sql/LordPsyan-Patches/world/world.congrats_on_level.sql
@@ -383,7 +383,7 @@ index 0000000000..240e5a28ac
 +}
 \ No newline at end of file
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..9626d5cf9f 100644
+index b6b83ac184..b1fd18938a 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -205,7 +205,8 @@
@@ -407,5 +407,5 @@ index 5412cf1942..9626d5cf9f 100644
  // end192
  // end193
 -- 
-2.11.0
+2.20.1
 
