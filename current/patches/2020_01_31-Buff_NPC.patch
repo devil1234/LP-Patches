@@ -1,15 +1,15 @@
-From d0660a0430abdc03e19a64574dd450b880e3c7e4 Mon Sep 17 00:00:00 2001
+From cfcc6458197a529bd8290d09dedb5716e24923e4 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Sat, 29 Sep 2018 03:04:40 -0500
-Subject: [PATCH] 2018_09_27-Buff_NPC
+Date: Tue, 11 Feb 2020 10:17:37 -0600
+Subject: [PATCH] 2020_01_31-Buff_NPC
 
 ---
- sql/LordPsyan-Patches/world/world.buf_npcf.sql     |  62 +++
- src/server/game/World/World.cpp                    |   8 +-
- src/server/game/World/World.h                      |   8 +-
- src/server/scripts/Custom/Buff_NPC.cpp             | 447 +++++++++++++++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |   6 +-
- src/server/worldserver/worldserver.conf.dist       |  49 +++
+ .../world/world.buf_npcf.sql                  |  62 +++
+ src/server/game/World/World.cpp               |   8 +-
+ src/server/game/World/World.h                 |   8 +-
+ src/server/scripts/Custom/Buff_NPC.cpp        | 447 ++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |   6 +-
+ src/server/worldserver/worldserver.conf.dist  |  49 ++
  6 files changed, 576 insertions(+), 4 deletions(-)
  create mode 100644 sql/LordPsyan-Patches/world/world.buf_npcf.sql
  create mode 100644 src/server/scripts/Custom/Buff_NPC.cpp
@@ -84,10 +84,10 @@ index 0000000000..286373a048
 +   (100003, 'Choose your Buff.');
 \ No newline at end of file
 diff --git a/src/server/game/World/World.cpp b/src/server/game/World/World.cpp
-index 82dbe507d3..a26b5ed4d9 100644
+index 86c38d6aa4..9353050802 100644
 --- a/src/server/game/World/World.cpp
 +++ b/src/server/game/World/World.cpp
-@@ -1284,7 +1284,13 @@ void World::LoadConfigSettings(bool reload)
+@@ -1323,7 +1323,13 @@ void World::LoadConfigSettings(bool reload)
      // 37
      // 38
      // 39
@@ -103,10 +103,10 @@ index 82dbe507d3..a26b5ed4d9 100644
      //
      // End of prepatch
 diff --git a/src/server/game/World/World.h b/src/server/game/World/World.h
-index c0cb58fc77..24ff0712a2 100644
+index 975cd0d06f..a566a61feb 100644
 --- a/src/server/game/World/World.h
 +++ b/src/server/game/World/World.h
-@@ -172,7 +172,13 @@ enum WorldBoolConfigs
+@@ -170,7 +170,13 @@ enum WorldBoolConfigs
      // 07
      // 08
      // 09
@@ -576,7 +576,7 @@ index 0000000000..e7e52d8ac3
 +}
 \ No newline at end of file
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..a23e4774cf 100644
+index b6b83ac184..570804c877 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -36,7 +36,8 @@
@@ -600,13 +600,14 @@ index 5412cf1942..a23e4774cf 100644
  // end23
  // end24
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index 6ee9e3158c..28ccf247bc 100644
+index afa4fcccce..fe1c7a6aaa 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -3285,6 +3285,55 @@ PreventRenameCharacterOnCustomization = 0
+@@ -3352,6 +3352,55 @@ PreventRenameCharacterOnCustomization = 0
+ #
  ###################################################################################################
  
- ###################################################################################################
++###################################################################################################
 +#
 +# Buff NPC rewritten by LordPsyan
 +#
@@ -655,10 +656,9 @@ index 6ee9e3158c..28ccf247bc 100644
 +#
 +###################################################################################################
 +
-+###################################################################################################
+ ###################################################################################################
  # AUCTION HOUSE BOT SETTINGS
  #
- #    AuctionHouseBot.Account
 -- 
-2.11.0
+2.20.1
 
