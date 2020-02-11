@@ -1,12 +1,12 @@
-From 211811b6d457f85422693b86eeedf60af8addea3 Mon Sep 17 00:00:00 2001
+From 3951fe6f187237e1097d9c4302ec4ca2e2c151a5 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Sat, 29 Sep 2018 16:34:53 -0500
-Subject: [PATCH] 2018_09_27-Double_XP_Weekend
+Date: Tue, 11 Feb 2020 13:00:33 -0600
+Subject: [PATCH] 2020_01_31-Double_XP_Weekend
 
 ---
- src/server/scripts/Custom/DoubleXP.cpp             | 43 ++++++++++++++++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |  6 ++-
- src/server/worldserver/worldserver.conf.dist       | 13 +++++++
+ src/server/scripts/Custom/DoubleXP.cpp        | 43 +++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |  6 ++-
+ src/server/worldserver/worldserver.conf.dist  | 13 ++++++
  3 files changed, 60 insertions(+), 2 deletions(-)
  create mode 100644 src/server/scripts/Custom/DoubleXP.cpp
 
@@ -60,7 +60,7 @@ index 0000000000..1251790a02
 +    new XpWeekend();
 +}
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..10f7d2004f 100644
+index b6b83ac184..da52ccbd81 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -179,7 +179,8 @@
@@ -84,10 +84,10 @@ index 5412cf1942..10f7d2004f 100644
  // end166
  // end167
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index 6ee9e3158c..29f52d3950 100644
+index afa4fcccce..589517483e 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -4016,6 +4016,19 @@ Metric.OverallStatusInterval = 1
+@@ -4096,6 +4096,19 @@ Metric.OverallStatusInterval = 1
  #
  ###################################################################################################
  
@@ -108,5 +108,5 @@ index 6ee9e3158c..29f52d3950 100644
  # Prepatch by LordPsyan.
  # See http://www.realmsofwarcraft.com/bb for forums and information.
 -- 
-2.11.0
+2.20.1
 
