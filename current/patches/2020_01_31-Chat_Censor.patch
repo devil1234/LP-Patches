@@ -1,11 +1,11 @@
-From 8197dcedf3a1ecf5ac1adb580ae9944e8115706f Mon Sep 17 00:00:00 2001
+From f3e9d773b6f731c604f851f9b16d8b206775472f Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Sat, 29 Sep 2018 03:23:32 -0500
-Subject: [PATCH] 2018_09_27-Chat_Censor
+Date: Tue, 11 Feb 2020 11:25:38 -0600
+Subject: [PATCH] 2020_01_31-Chat_Censor
 
 ---
- src/server/scripts/Custom/chat_censor.cpp          | 107 +++++++++++++++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |   6 +-
+ src/server/scripts/Custom/chat_censor.cpp     | 107 ++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |   6 +-
  2 files changed, 111 insertions(+), 2 deletions(-)
  create mode 100644 src/server/scripts/Custom/chat_censor.cpp
 
@@ -123,7 +123,7 @@ index 0000000000..379ddcaabb
 +    new System_Censure();
 +}
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..763ccca227 100644
+index b6b83ac184..98904a51e5 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -145,7 +145,8 @@
@@ -147,5 +147,5 @@ index 5412cf1942..763ccca227 100644
  // end132
  // end133
 -- 
-2.11.0
+2.20.1
 
