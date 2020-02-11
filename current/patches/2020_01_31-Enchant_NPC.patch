@@ -1,12 +1,12 @@
-From f6250581425692ef7c7709a944e52258becfb82e Mon Sep 17 00:00:00 2001
+From a378cb683c973c940961e64f777965aa40895fb9 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Sat, 29 Sep 2018 12:50:34 -0500
-Subject: [PATCH] 2018_09_27-Enchant_NPC
+Date: Tue, 11 Feb 2020 13:55:06 -0600
+Subject: [PATCH] 2020_01_31-Enchant_NPC
 
 ---
- sql/LordPsyan-Patches/world/world.enchantnpc.sql   |    4 +
- src/server/scripts/Custom/custom_script_loader.cpp |    6 +-
- src/server/scripts/Custom/enchant.cpp              | 1651 ++++++++++++++++++++
+ .../world/world.enchantnpc.sql                |    4 +
+ .../scripts/Custom/custom_script_loader.cpp   |    6 +-
+ src/server/scripts/Custom/enchant.cpp         | 1651 +++++++++++++++++
  3 files changed, 1659 insertions(+), 2 deletions(-)
  create mode 100644 sql/LordPsyan-Patches/world/world.enchantnpc.sql
  create mode 100644 src/server/scripts/Custom/enchant.cpp
@@ -22,7 +22,7 @@ index 0000000000..99b4af49dc
 +INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entry_2`, `difficulty_entry_3`, `KillCredit1`, `KillCredit2`, `modelid1`, `modelid2`, `modelid3`, `modelid4`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `scale`, `rank`, `dmgschool`, `BaseAttackTime`, `RangeAttackTime`, `BaseVariance`, `RangeVariance`, `unit_class`, `unit_flags`, `unit_flags2`, `dynamicflags`, `family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `spell1`, `spell2`, `spell3`, `spell4`, `spell5`, `spell6`, `spell7`, `spell8`, `PetSpellDataId`, `VehicleId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `HoverHeight`, `HealthModifier`, `ManaModifier`, `ArmorModifier`, `DamageModifier`, `ExperienceModifier`, `RacialLeader`, `movementId`, `RegenHealth`, `mechanic_immune_mask`, `flags_extra`, `ScriptName`, `VerifiedBuild`) values
 +('100067','0','0','0','0','0','2591','0','0','0','Young Woman','You need it, I got it.','','0','80','80','0','35','1','1','1.14286','1','1','0','1500','0','1','1','1','0','2048','0','0','0','0','0','0','7','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','','0','1','1','1','1','1','1','0','0','1','0','0','npc_enchantment','0');
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..6c1611a0f1 100644
+index b6b83ac184..3315eff4b3 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -28,7 +28,8 @@
@@ -1703,5 +1703,5 @@ index 0000000000..585337a82b
 +  new npc_enchantment();
 +}
 -- 
-2.11.0
+2.20.1
 
