@@ -1,18 +1,18 @@
-From 745b3ef1898c0ba8c2ed16fbc548f078a4e8e187 Mon Sep 17 00:00:00 2001
+From 3949842d4cfcd095946cbce746f50ff41e8830f4 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Sat, 29 Sep 2018 16:57:39 -0500
-Subject: [PATCH] 2018_09_27-External_Mail
+Date: Wed, 12 Feb 2020 00:45:38 -0600
+Subject: [PATCH] 2020_01_31-External_Mail
 
 ---
- .../characters/characters.external_mail.sql        | 10 ++++
- .../Database/Implementation/CharacterDatabase.cpp  |  3 ++
- .../Database/Implementation/CharacterDatabase.h    |  2 +
- src/server/game/Mails/Mail.cpp                     | 62 ++++++++++++++++++++++
- src/server/game/Server/WorldSession.h              |  1 +
- src/server/game/World/World.cpp                    | 19 ++++++-
- src/server/game/World/World.h                      |  4 +-
- src/server/worldserver/worldserver.conf.dist       | 18 +++++++
- 8 files changed, 117 insertions(+), 2 deletions(-)
+ .../characters/characters.external_mail.sql   | 10 +++
+ .../Implementation/CharacterDatabase.cpp      |  3 +
+ .../Implementation/CharacterDatabase.h        |  2 +
+ src/server/game/Mails/Mail.cpp                | 62 +++++++++++++++++++
+ src/server/game/Server/WorldSession.h         |  3 +
+ src/server/game/World/World.cpp               | 19 +++++-
+ src/server/game/World/World.h                 |  4 +-
+ src/server/worldserver/worldserver.conf.dist  | 18 ++++++
+ 8 files changed, 119 insertions(+), 2 deletions(-)
  create mode 100644 sql/LordPsyan-Patches/characters/characters.external_mail.sql
 
 diff --git a/sql/LordPsyan-Patches/characters/characters.external_mail.sql b/sql/LordPsyan-Patches/characters/characters.external_mail.sql
@@ -33,7 +33,7 @@ index 0000000000..8cd6a05803
 +) ENGINE=MyISAM AUTO_INCREMENT=7525 DEFAULT CHARSET=utf8;
 \ No newline at end of file
 diff --git a/src/server/database/Database/Implementation/CharacterDatabase.cpp b/src/server/database/Database/Implementation/CharacterDatabase.cpp
-index 4582d88822..2cf6d3596d 100644
+index d3533fc143..7a1626ae3d 100644
 --- a/src/server/database/Database/Implementation/CharacterDatabase.cpp
 +++ b/src/server/database/Database/Implementation/CharacterDatabase.cpp
 @@ -142,6 +142,9 @@ void CharacterDatabaseConnection::DoPrepareStatements()
@@ -47,7 +47,7 @@ index 4582d88822..2cf6d3596d 100644
      PrepareStatement(CHAR_SEL_ITEM_REFUNDS, "SELECT player_guid, paidMoney, paidExtendedCost FROM item_refund_instance WHERE item_guid = ? AND player_guid = ? LIMIT 1", CONNECTION_SYNCH);
      PrepareStatement(CHAR_SEL_ITEM_BOP_TRADE, "SELECT allowedPlayers FROM item_soulbound_trade_data WHERE itemGuid = ? LIMIT 1", CONNECTION_SYNCH);
 diff --git a/src/server/database/Database/Implementation/CharacterDatabase.h b/src/server/database/Database/Implementation/CharacterDatabase.h
-index 359f945d1b..160d6061d4 100644
+index 64e078acd8..f0089f33cb 100644
 --- a/src/server/database/Database/Implementation/CharacterDatabase.h
 +++ b/src/server/database/Database/Implementation/CharacterDatabase.h
 @@ -127,6 +127,8 @@ enum CharacterDatabaseStatements : uint32
@@ -60,10 +60,10 @@ index 359f945d1b..160d6061d4 100644
      CHAR_SEL_ITEM_BOP_TRADE,
      CHAR_DEL_ITEM_BOP_TRADE,
 diff --git a/src/server/game/Mails/Mail.cpp b/src/server/game/Mails/Mail.cpp
-index e4cf914f98..8cbac4cb71 100644
+index a893b3f32b..49a3cf4cdb 100644
 --- a/src/server/game/Mails/Mail.cpp
 +++ b/src/server/game/Mails/Mail.cpp
-@@ -30,6 +30,7 @@
+@@ -29,6 +29,7 @@
  #include "ObjectMgr.h"
  #include "Player.h"
  #include "World.h"
@@ -71,7 +71,7 @@ index e4cf914f98..8cbac4cb71 100644
  
  MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery(stationery)
  {
-@@ -292,3 +293,64 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver,
+@@ -295,3 +296,64 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver,
          deleteIncludedItems(temp);
      }
  }
@@ -138,22 +138,24 @@ index e4cf914f98..8cbac4cb71 100644
 +}
 \ No newline at end of file
 diff --git a/src/server/game/Server/WorldSession.h b/src/server/game/Server/WorldSession.h
-index 540bc23912..49aed8d655 100644
+index 2fec036002..44d55e53a1 100644
 --- a/src/server/game/Server/WorldSession.h
 +++ b/src/server/game/Server/WorldSession.h
-@@ -397,6 +397,7 @@ class TC_GAME_API WorldSession
+@@ -408,6 +408,9 @@ class TC_GAME_API WorldSession
+                 m_TutorialsChanged |= TUTORIALS_FLAG_CHANGED;
              }
          }
-         //used with item_page table
++        //External Mail
 +        static void SendExternalMails();
-         bool SendItemInfo(uint32 itemid, WorldPacket data);
++
          //auction
          void SendAuctionHello(ObjectGuid guid, Creature* unit);
+         void SendAuctionCommandResult(uint32 auctionItemId, AuctionAction command, AuctionError errorCode, InventoryResult bagResult = InventoryResult(0));
 diff --git a/src/server/game/World/World.cpp b/src/server/game/World/World.cpp
-index 82dbe507d3..2c00439249 100644
+index 86c38d6aa4..e425b4738e 100644
 --- a/src/server/game/World/World.cpp
 +++ b/src/server/game/World/World.cpp
-@@ -1466,6 +1466,10 @@ void World::LoadConfigSettings(bool reload)
+@@ -1505,6 +1505,10 @@ void World::LoadConfigSettings(bool reload)
      // MySQL ping time interval
      m_int_configs[CONFIG_DB_PING_INTERVAL] = sConfigMgr->GetIntDefault("MaxPingTime", 30);
  
@@ -164,7 +166,7 @@ index 82dbe507d3..2c00439249 100644
      // misc
      m_bool_configs[CONFIG_PDUMP_NO_PATHS] = sConfigMgr->GetBoolDefault("PlayerDump.DisallowPaths", true);
      m_bool_configs[CONFIG_PDUMP_NO_OVERWRITE] = sConfigMgr->GetBoolDefault("PlayerDump.DisallowOverwrite", true);
-@@ -2127,7 +2131,9 @@ void World::SetInitialWorldSettings()
+@@ -2180,7 +2184,9 @@ void World::SetInitialWorldSettings()
      localtime_r(&gameTime, &localTm);
      uint8 CleanOldMailsTime = getIntConfig(CONFIG_CLEAN_OLD_MAIL_TIME);
      mail_timer = ((((localTm.tm_hour + (24 - CleanOldMailsTime)) % 24)* HOUR * IN_MILLISECONDS) / m_timers[WUPDATE_AUCTIONS].GetInterval());
@@ -175,7 +177,7 @@ index 82dbe507d3..2c00439249 100644
      mail_timer_expires = ((DAY * IN_MILLISECONDS) / (m_timers[WUPDATE_AUCTIONS].GetInterval()));
      TC_LOG_INFO("server.loading", "Mail timer set to: " UI64FMTD ", mail return is called every " UI64FMTD " minutes", uint64(mail_timer), uint64(mail_timer_expires));
  
-@@ -2346,6 +2352,17 @@ void World::Update(uint32 diff)
+@@ -2398,6 +2404,17 @@ void World::Update(uint32 diff)
      if (currentGameTime > m_NextGuildReset)
          ResetGuildCap();
  
@@ -194,10 +196,10 @@ index 82dbe507d3..2c00439249 100644
      if (m_timers[WUPDATE_AUCTIONS].Passed())
      {
 diff --git a/src/server/game/World/World.h b/src/server/game/World/World.h
-index c0cb58fc77..f5dd7e64e0 100644
+index 975cd0d06f..8b7429b910 100644
 --- a/src/server/game/World/World.h
 +++ b/src/server/game/World/World.h
-@@ -197,7 +197,7 @@ enum WorldBoolConfigs
+@@ -195,7 +195,7 @@ enum WorldBoolConfigs
      // 32
      // 33
      // 34
@@ -206,7 +208,7 @@ index c0cb58fc77..f5dd7e64e0 100644
      // 36
      // 37
      // 38
-@@ -461,6 +461,7 @@ enum WorldIntConfigs
+@@ -464,6 +464,7 @@ enum WorldIntConfigs
      CONFIG_CREATURE_PICKPOCKET_REFILL,
      CONFIG_CREATURE_STOP_FOR_PLAYER,
      CONFIG_AHBOT_UPDATE_INTERVAL,
@@ -214,7 +216,7 @@ index c0cb58fc77..f5dd7e64e0 100644
      CONFIG_CHARTER_COST_GUILD,
      CONFIG_CHARTER_COST_ARENA_2v2,
      CONFIG_CHARTER_COST_ARENA_3v3,
-@@ -933,6 +934,7 @@ class TC_GAME_API World
+@@ -941,6 +942,7 @@ class TC_GAME_API World
          bool m_isClosed;
  
          IntervalTimer m_timers[WUPDATE_COUNT];
@@ -223,10 +225,10 @@ index c0cb58fc77..f5dd7e64e0 100644
          time_t mail_timer_expires;
  
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index 6ee9e3158c..1fc14f927b 100644
+index afa4fcccce..0e9edaa523 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -4016,6 +4016,24 @@ Metric.OverallStatusInterval = 1
+@@ -4096,6 +4096,24 @@ Metric.OverallStatusInterval = 1
  #
  ###################################################################################################
  
@@ -252,5 +254,5 @@ index 6ee9e3158c..1fc14f927b 100644
  # Prepatch by LordPsyan.
  # See http://www.realmsofwarcraft.com/bb for forums and information.
 -- 
-2.11.0
+2.20.1
 
