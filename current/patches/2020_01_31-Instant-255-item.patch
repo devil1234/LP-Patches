@@ -1,0 +1,98 @@
+From 02109f362c2d8da664ceeab53ee5a5eda9985031 Mon Sep 17 00:00:00 2001
+From: LordPsyan <lordpsyan@gmail.com>
+Date: Wed, 12 Feb 2020 01:59:14 -0600
+Subject: [PATCH] 2020_01_31-Instant-255-item
+
+---
+ src/server/game/Miscellaneous/Language.h      |  3 +-
+ src/server/scripts/Custom/255_item.cpp        | 40 +++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |  4 +-
+ 3 files changed, 44 insertions(+), 3 deletions(-)
+ create mode 100644 src/server/scripts/Custom/255_item.cpp
+
+diff --git a/src/server/game/Miscellaneous/Language.h b/src/server/game/Miscellaneous/Language.h
+index c1c9d2e793..e7c4e24be6 100644
+--- a/src/server/game/Miscellaneous/Language.h
++++ b/src/server/game/Miscellaneous/Language.h
+@@ -1221,7 +1221,8 @@ enum TrinityStrings
+     // 36
+     // 37
+     // 38
+-    // 39
++    LANG_SAY_LVL_UP_ITEM                          = 11100,
++    LANG_ERROR_LVL_UP_ITEM                        = 11101,
+     // 40
+     // Visit http://www.realmsofwarcraft.com/bb for forums and information
+     //
+diff --git a/src/server/scripts/Custom/255_item.cpp b/src/server/scripts/Custom/255_item.cpp
+new file mode 100644
+index 0000000000..6e25705fb9
+--- /dev/null
++++ b/src/server/scripts/Custom/255_item.cpp
+@@ -0,0 +1,40 @@
++#include "LordPsyan.h"
++
++class item_255 : public ItemScript
++{
++public: item_255() : ItemScript("item_255") {}
++
++      bool OnUse(Player* player, Item* item, SpellCastTargets const& /*Targets*/)
++      {
++         WorldSession* session = player->GetSession();
++         if (player->GetLevel() !=255)
++         {
++            if (player->IsInFlight()||player->IsInCombat()||player->isDead())
++            {
++               player->SendEquipError(EQUIP_ERR_NOT_IN_COMBAT, item, NULL);
++               return true;
++            }
++            else
++            {
++               int32 level = player->GetLevel();
++               player->SetLevel(255);
++               player->DestroyItemCount(item->GetEntry(),1,true);
++               ChatHandler(session).PSendSysMessage(LANG_SAY_LVL_UP_ITEM);
++               return true;
++            }
++            return true;
++         }
++         else
++         {
++            ChatHandler(session).PSendSysMessage(LANG_ERROR_LVL_UP_ITEM);
++            return true;
++         }
++         return true;
++      }
++
++};
++
++void AddSC_item_255()
++{
++   new item_255();
++}
+\ No newline at end of file
+diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
+index b6b83ac184..eb699d0f3c 100644
+--- a/src/server/scripts/Custom/custom_script_loader.cpp
++++ b/src/server/scripts/Custom/custom_script_loader.cpp
+@@ -16,7 +16,7 @@
+  */
+ 
+ // This is where scripts' loading functions should be declared:
+-// start01
++void AddSC_item_255();
+ // start02
+ // start03
+ // start04
+@@ -221,7 +221,7 @@
+ // void Add${NameOfDirectory}Scripts()
+ void AddCustomScripts()
+ {
+-// end01
++    AddSC_item_255();
+ // end02
+ // end03
+ // end04
+-- 
+2.20.1
+
