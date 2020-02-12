@@ -1,28 +1,28 @@
-From d1dd54e2627e4c5beddd11a91e6d7b7bc3e4773d Mon Sep 17 00:00:00 2001
+From eab75b5551be7e8fc4e9c6090f62a03d4513d809 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Sun, 30 Sep 2018 13:50:46 -0500
-Subject: [PATCH] 2018_09_27-Guard-Elite-Honor
+Date: Wed, 12 Feb 2020 12:43:38 -0600
+Subject: [PATCH] 2020_01_31-Guard-Elite-Honor
 
 ---
- src/server/game/Entities/Player/Player.cpp   | 47 ++++++++++++++++++++++++++++
+ src/server/game/Entities/Player/Player.cpp   | 47 ++++++++++++++++++++
  src/server/game/World/World.cpp              |  3 +-
  src/server/game/World/World.h                |  3 +-
- src/server/worldserver/worldserver.conf.dist | 22 +++++++++++++
+ src/server/worldserver/worldserver.conf.dist | 22 +++++++++
  4 files changed, 73 insertions(+), 2 deletions(-)
 
 diff --git a/src/server/game/Entities/Player/Player.cpp b/src/server/game/Entities/Player/Player.cpp
-index 467fb9f23b..1a061bdb04 100644
+index 30444f2f2f..4203ad8433 100644
 --- a/src/server/game/Entities/Player/Player.cpp
 +++ b/src/server/game/Entities/Player/Player.cpp
-@@ -6831,6 +6831,53 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
-             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA, GetAreaId());
+@@ -6867,6 +6867,53 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
              UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL, 1, 0, victim);
+             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL, 1, 0, victim);
          }
 +        else if (sWorld->getBoolConfig(CONFIG_GAIN_HONOR_GUARD) && victim->ToCreature()->IsGuard())
 +        {
-+            uint8 k_level = getLevel();
++            uint8 k_level = GetLevel();
 +            uint8 k_grey = Trinity::XP::GetGrayLevel(k_level);
-+            uint8 v_level = victim->getLevel();
++            uint8 v_level = victim->GetLevel();
 +
 +            if (v_level <= k_grey)
 +                return false;
@@ -37,16 +37,16 @@ index 467fb9f23b..1a061bdb04 100644
 +            // and those in a lifetime
 +            ApplyModUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS, 1, true);
 +            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL);
-+            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS, victim->getClass());
-+            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_RACE, victim->getRace());
++            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS, victim->GetClass());
++            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_RACE, victim->GetRace());
 +            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA, GetAreaId());
 +            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL, 1, 0, victim);
 +        }
 +        else if (sWorld->getBoolConfig(CONFIG_GAIN_HONOR_ELITE) && victim->ToCreature()->isElite())
 +        {
-+            uint8 k_level = getLevel();
++            uint8 k_level = GetLevel();
 +            uint8 k_grey = Trinity::XP::GetGrayLevel(k_level);
-+            uint8 v_level = victim->getLevel();
++            uint8 v_level = victim->GetLevel();
 +
 +            if (v_level <= k_grey)
 +                return false;
@@ -60,8 +60,8 @@ index 467fb9f23b..1a061bdb04 100644
 +            // and those in a lifetime
 +            ApplyModUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS, 1, true);
 +            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL);
-+            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS, victim->getClass());
-+            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_RACE, victim->getRace());
++            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS, victim->GetClass());
++            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_RACE, victim->GetRace());
 +            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA, GetAreaId());
 +            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL, 1, 0, victim);
 +        }
@@ -69,10 +69,10 @@ index 467fb9f23b..1a061bdb04 100644
          {
              if (!victim->ToCreature()->IsRacialLeader())
 diff --git a/src/server/game/World/World.cpp b/src/server/game/World/World.cpp
-index 82dbe507d3..db06c2e789 100644
+index 86c38d6aa4..1fe360e855 100644
 --- a/src/server/game/World/World.cpp
 +++ b/src/server/game/World/World.cpp
-@@ -1265,7 +1265,8 @@ void World::LoadConfigSettings(bool reload)
+@@ -1304,7 +1304,8 @@ void World::LoadConfigSettings(bool reload)
      m_visibility_notify_periodInInstances = sConfigMgr->GetIntDefault("Visibility.Notify.Period.InInstances",   DEFAULT_VISIBILITY_NOTIFY_PERIOD);
      m_visibility_notify_periodInBGArenas = sConfigMgr->GetIntDefault("Visibility.Notify.Period.InBGArenas",    DEFAULT_VISIBILITY_NOTIFY_PERIOD);
      // Prepatch by LordPsyan
@@ -83,10 +83,10 @@ index 82dbe507d3..db06c2e789 100644
      // 23
      // 24
 diff --git a/src/server/game/World/World.h b/src/server/game/World/World.h
-index c0cb58fc77..1f79d208b7 100644
+index 975cd0d06f..28b3c8583f 100644
 --- a/src/server/game/World/World.h
 +++ b/src/server/game/World/World.h
-@@ -181,7 +181,8 @@ enum WorldBoolConfigs
+@@ -179,7 +179,8 @@ enum WorldBoolConfigs
      // 16
      // 17
      // 18
@@ -97,10 +97,10 @@ index c0cb58fc77..1f79d208b7 100644
      // 21
      // 22
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index 6ee9e3158c..ae1d66c44c 100644
+index afa4fcccce..35f2fffff1 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -4016,6 +4016,28 @@ Metric.OverallStatusInterval = 1
+@@ -4096,6 +4096,28 @@ Metric.OverallStatusInterval = 1
  #
  ###################################################################################################
  
@@ -130,5 +130,5 @@ index 6ee9e3158c..ae1d66c44c 100644
  # Prepatch by LordPsyan.
  # See http://www.realmsofwarcraft.com/bb for forums and information.
 -- 
-2.11.0
+2.20.1
 
