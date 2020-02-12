@@ -1,20 +1,20 @@
-From 1857747666846126e3f6281c2ddccd9e14176661 Mon Sep 17 00:00:00 2001
+From 96b8687db1c9af8f0169f8db742650b65ab2f8c1 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Sat, 29 Sep 2018 21:41:57 -0500
-Subject: [PATCH] 2018_09_27-Fake_Players
+Date: Wed, 12 Feb 2020 01:11:58 -0600
+Subject: [PATCH] 2020_01_31-Fake_Players
 
 ---
- .../Fake_Players/characters.fake_players.sql       | 36 +++++++++++++++++++++
- .../Fake_Players/world.fake_players.sql            |  6 ++++
- src/server/game/Entities/Player/Player.cpp         |  4 +++
- src/server/game/Guilds/Guild.cpp                   |  7 ++++
- src/server/game/Handlers/ChatHandler.cpp           |  9 ++++++
- src/server/game/Handlers/GroupHandler.cpp          |  9 ++++++
- src/server/game/Handlers/MiscHandler.cpp           | 37 +++++++++++++++++++++-
- src/server/game/Miscellaneous/Language.h           |  4 ++-
- src/server/game/World/World.cpp                    |  1 +
- src/server/game/World/World.h                      |  1 +
- src/server/worldserver/worldserver.conf.dist       |  8 +++++
+ .../Fake_Players/characters.fake_players.sql  | 36 ++++++++++++++++++
+ .../Fake_Players/world.fake_players.sql       |  6 +++
+ src/server/game/Entities/Player/Player.cpp    |  4 ++
+ src/server/game/Guilds/Guild.cpp              |  7 ++++
+ src/server/game/Handlers/ChatHandler.cpp      |  9 +++++
+ src/server/game/Handlers/GroupHandler.cpp     |  9 +++++
+ src/server/game/Handlers/MiscHandler.cpp      | 37 ++++++++++++++++++-
+ src/server/game/Miscellaneous/Language.h      |  4 +-
+ src/server/game/World/World.cpp               |  1 +
+ src/server/game/World/World.h                 |  1 +
+ src/server/worldserver/worldserver.conf.dist  |  8 ++++
  11 files changed, 120 insertions(+), 2 deletions(-)
  create mode 100644 sql/LordPsyan-Patches/Fake_Players/characters.fake_players.sql
  create mode 100644 sql/LordPsyan-Patches/Fake_Players/world.fake_players.sql
@@ -75,10 +75,10 @@ index 0000000000..32b01df9a5
 +('10102','Message: \"Player already in party\".',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'РЎРѕРѕР±С‰РµРЅРёРµ: \"РќРµ Р±РµСЃРїРѕРєРѕРёС‚СЊ\".');
 \ No newline at end of file
 diff --git a/src/server/game/Entities/Player/Player.cpp b/src/server/game/Entities/Player/Player.cpp
-index 467fb9f23b..f697d458bb 100644
+index 30444f2f2f..1f4c0fb017 100644
 --- a/src/server/game/Entities/Player/Player.cpp
 +++ b/src/server/game/Entities/Player/Player.cpp
-@@ -1279,6 +1279,10 @@ void Player::Update(uint32 p_time)
+@@ -1271,6 +1271,10 @@ void Player::Update(uint32 p_time)
              // m_nextSave reset in SaveToDB call
              SaveToDB();
              TC_LOG_DEBUG("entities.player", "Player::Update: Player '%s' (%s) saved", GetName().c_str(), GetGUID().ToString().c_str());
@@ -90,10 +90,10 @@ index 467fb9f23b..f697d458bb 100644
          else
              m_nextSave -= p_time;
 diff --git a/src/server/game/Guilds/Guild.cpp b/src/server/game/Guilds/Guild.cpp
-index d2ab24bea8..c96cf80752 100644
+index 88f08676bd..2ebd8a7615 100644
 --- a/src/server/game/Guilds/Guild.cpp
 +++ b/src/server/game/Guilds/Guild.cpp
-@@ -1579,7 +1579,14 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
+@@ -1580,7 +1580,14 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
      Player* pInvitee = ObjectAccessor::FindPlayerByName(name);
      if (!pInvitee)
      {
@@ -109,10 +109,10 @@ index d2ab24bea8..c96cf80752 100644
      }
  
 diff --git a/src/server/game/Handlers/ChatHandler.cpp b/src/server/game/Handlers/ChatHandler.cpp
-index d7ac3e506a..ec4294f2ba 100644
+index 181b5d13ef..e317b068c4 100644
 --- a/src/server/game/Handlers/ChatHandler.cpp
 +++ b/src/server/game/Handlers/ChatHandler.cpp
-@@ -361,8 +361,17 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
+@@ -360,8 +360,17 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
              Player* receiver = ObjectAccessor::FindConnectedPlayerByName(to);
              if (!receiver || (lang != LANG_ADDON && !receiver->isAcceptWhispers() && receiver->GetSession()->HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
              {
@@ -128,13 +128,13 @@ index d7ac3e506a..ec4294f2ba 100644
                  return;
 +                }
              }
-             if (!sender->IsGameMaster() && sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ) && !receiver->IsInWhisperWhiteList(sender->GetGUID()))
-             {
+ 
+             // Apply checks only if receiver is not already in whitelist and if receiver is not a GM with ".whisper on"
 diff --git a/src/server/game/Handlers/GroupHandler.cpp b/src/server/game/Handlers/GroupHandler.cpp
-index b52386f277..2d5cacffdf 100644
+index d52118e6d8..54449e7c80 100644
 --- a/src/server/game/Handlers/GroupHandler.cpp
 +++ b/src/server/game/Handlers/GroupHandler.cpp
-@@ -22,6 +22,7 @@
+@@ -21,6 +21,7 @@
  #include "DatabaseEnv.h"
  #include "Group.h"
  #include "GroupMgr.h"
@@ -142,7 +142,7 @@ index b52386f277..2d5cacffdf 100644
  #include "Log.h"
  #include "ObjectAccessor.h"
  #include "ObjectMgr.h"
-@@ -81,7 +82,15 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
+@@ -80,7 +81,15 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
      // no player
      if (!invitedPlayer)
      {
@@ -159,10 +159,10 @@ index b52386f277..2d5cacffdf 100644
      }
  
 diff --git a/src/server/game/Handlers/MiscHandler.cpp b/src/server/game/Handlers/MiscHandler.cpp
-index 763dc7e03f..c8beaa8dfd 100644
+index 12fc66216a..d95036b359 100644
 --- a/src/server/game/Handlers/MiscHandler.cpp
 +++ b/src/server/game/Handlers/MiscHandler.cpp
-@@ -54,6 +54,7 @@
+@@ -53,6 +53,7 @@
  #include <cstdarg>
  #include <zlib.h>
  
@@ -170,7 +170,7 @@ index 763dc7e03f..c8beaa8dfd 100644
  void WorldSession::HandleRepopRequestOpcode(WorldPacket& recvData)
  {
      TC_LOG_DEBUG("network", "WORLD: Recvd CMSG_REPOP_REQUEST Message");
-@@ -345,7 +346,39 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
+@@ -344,7 +345,39 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
          ++displayCount;
      }
  
@@ -211,7 +211,7 @@ index 763dc7e03f..c8beaa8dfd 100644
      data.put(4, matchCount);                              // insert right count, count of matches
  
      SendPacket(&data);
-@@ -503,6 +536,7 @@ void WorldSession::HandleStandStateChangeOpcode(WorldPacket& recvData)
+@@ -512,6 +545,7 @@ void WorldSession::HandleStandStateChangeOpcode(WorldPacket& recvData)
      _player->SetStandState(animstate);
  }
  
@@ -219,7 +219,7 @@ index 763dc7e03f..c8beaa8dfd 100644
  void WorldSession::HandleBugOpcode(WorldPacket& recvData)
  {
      uint32 suggestion, contentlen, typelen;
-@@ -1024,6 +1058,7 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recvData)
+@@ -1010,6 +1044,7 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recvData)
  
      Player* player = ObjectAccessor::GetPlayer(*_player, guid);
  
@@ -228,10 +228,10 @@ index 763dc7e03f..c8beaa8dfd 100644
      {
          TC_LOG_DEBUG("network", "MSG_INSPECT_HONOR_STATS: No player found from %s", guid.ToString().c_str());
 diff --git a/src/server/game/Miscellaneous/Language.h b/src/server/game/Miscellaneous/Language.h
-index 5663ae4b65..87337c0381 100644
+index c1c9d2e793..e8fa3a2e47 100644
 --- a/src/server/game/Miscellaneous/Language.h
 +++ b/src/server/game/Miscellaneous/Language.h
-@@ -1214,7 +1214,9 @@ enum TrinityStrings
+@@ -1209,7 +1209,9 @@ enum TrinityStrings
      // 24
      // 25
      // 26
@@ -243,10 +243,10 @@ index 5663ae4b65..87337c0381 100644
      // 29
      // 30
 diff --git a/src/server/game/World/World.cpp b/src/server/game/World/World.cpp
-index 82dbe507d3..e4ee60fd00 100644
+index 86c38d6aa4..447888b484 100644
 --- a/src/server/game/World/World.cpp
 +++ b/src/server/game/World/World.cpp
-@@ -789,6 +789,7 @@ void World::LoadConfigSettings(bool reload)
+@@ -814,6 +814,7 @@ void World::LoadConfigSettings(bool reload)
      m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD]   = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Guild", false);
      m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION] = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Auction", false);
      m_bool_configs[CONFIG_ALLOW_TWO_SIDE_TRADE]               = sConfigMgr->GetBoolDefault("AllowTwoSide.Trade", false);
@@ -255,10 +255,10 @@ index 82dbe507d3..e4ee60fd00 100644
      m_int_configs[CONFIG_STRICT_CHARTER_NAMES]                = sConfigMgr->GetIntDefault ("StrictCharterNames", 0);
      m_int_configs[CONFIG_STRICT_PET_NAMES]                    = sConfigMgr->GetIntDefault ("StrictPetNames",     0);
 diff --git a/src/server/game/World/World.h b/src/server/game/World/World.h
-index c0cb58fc77..327c2e57b2 100644
+index 975cd0d06f..b85f3b3930 100644
 --- a/src/server/game/World/World.h
 +++ b/src/server/game/World/World.h
-@@ -100,6 +100,7 @@ enum WorldBoolConfigs
+@@ -99,6 +99,7 @@ enum WorldBoolConfigs
      CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD,
      CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION,
      CONFIG_ALLOW_TWO_SIDE_TRADE,
@@ -267,10 +267,10 @@ index c0cb58fc77..327c2e57b2 100644
      CONFIG_INSTANT_TAXI,
      CONFIG_INSTANCE_IGNORE_LEVEL,
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index 6ee9e3158c..5a5aeb5267 100644
+index afa4fcccce..ebc27cbda0 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -1571,6 +1571,14 @@ AllowTwoSide.Interaction.Auction = 0
+@@ -1600,6 +1600,14 @@ AllowTwoSide.Interaction.Auction = 0
  
  AllowTwoSide.Trade = 0
  
@@ -286,5 +286,5 @@ index 6ee9e3158c..5a5aeb5267 100644
  #    TalentsInspecting
  #        Description: Allow/disallow inspecting other characters' talents.
 -- 
-2.11.0
+2.20.1
 
