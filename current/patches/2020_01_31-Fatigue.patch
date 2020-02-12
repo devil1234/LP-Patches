@@ -1,7 +1,7 @@
-From 72aabd58c28c96f47e2a11444ce2d0b669cf92e2 Mon Sep 17 00:00:00 2001
+From c1ee5cbfb4e63547260d3be660be28dfbb62ae23 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Sat, 29 Sep 2018 21:38:55 -0500
-Subject: [PATCH] 2018_09_27-Fatigue
+Date: Wed, 12 Feb 2020 02:36:01 -0600
+Subject: [PATCH] 2020_01_31-Fatigue
 
 ---
  src/server/game/Entities/Player/Player.cpp   | 7 ++++++-
@@ -9,7 +9,7 @@ Subject: [PATCH] 2018_09_27-Fatigue
  2 files changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/src/server/game/Entities/Player/Player.cpp b/src/server/game/Entities/Player/Player.cpp
-index 467fb9f23b..e72693192b 100644
+index 30444f2f2f..5ef57db1f2 100644
 --- a/src/server/game/Entities/Player/Player.cpp
 +++ b/src/server/game/Entities/Player/Player.cpp
 @@ -826,8 +826,11 @@ int32 Player::getMaxTimer(MirrorTimerType timer) const
@@ -43,23 +43,23 @@ index 467fb9f23b..e72693192b 100644
      {
          // Breath timer not activated - activate it
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index 6ee9e3158c..a47a939fa7 100644
+index afa4fcccce..4ab1b7b07c 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -920,6 +920,13 @@ RecruitAFriend.MaxDifference = 4
+@@ -912,6 +912,13 @@ RecruitAFriend.MaxDifference = 4
+ 
  DisableWaterBreath = 4
  
- #
++#
 +#    Enable or Disable "Fatigue" timer
 +#           default = 1 (enabled)
 +#                   = 0 (disabled)
 +
 +fatigue.enabled = 1
 +
-+#
+ #
  #    AllFlightPaths
  #        Description: Character knows all flight paths (of both factions) after creation.
- #        Default:     0 - (Disabled)
 -- 
-2.11.0
+2.20.1
 
