@@ -1,16 +1,16 @@
-From 912f81c4e2b898526f6cc938e8e8dcd268b22b87 Mon Sep 17 00:00:00 2001
+From 162d6503b5cbed532123a4cc2050982bb6c9f1e1 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Sun, 30 Sep 2018 19:32:50 -0500
-Subject: [PATCH] 2018_09_27-Login_Reset
+Date: Thu, 13 Feb 2020 13:27:50 -0600
+Subject: [PATCH] 2020_01_31-Login_Reset
 
 ---
- src/server/scripts/Custom/custom_script_loader.cpp |  6 ++--
- src/server/scripts/Custom/login_reset.cpp          | 32 ++++++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |  6 ++--
+ src/server/scripts/Custom/login_reset.cpp     | 32 +++++++++++++++++++
  2 files changed, 36 insertions(+), 2 deletions(-)
  create mode 100644 src/server/scripts/Custom/login_reset.cpp
 
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..39ad00152f 100644
+index b6b83ac184..a79e3a8e73 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -137,7 +137,8 @@
@@ -72,5 +72,5 @@ index 0000000000..4168fe9208
 +    new login_script();
 +}
 -- 
-2.11.0
+2.20.1
 
