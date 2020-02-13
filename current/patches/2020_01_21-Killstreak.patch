@@ -1,16 +1,16 @@
-From 600c393136a57e9bc3462246aeb892db2bf1d130 Mon Sep 17 00:00:00 2001
+From c14ed6bc5754770c9bd4b52ff1491a29e6e0eff4 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Sun, 30 Sep 2018 14:51:44 -0500
-Subject: [PATCH] 2018_09_27-Killstreak
+Date: Thu, 13 Feb 2020 01:34:03 -0600
+Subject: [PATCH] 2020_01_21-Killstreak
 
 ---
- src/server/scripts/Custom/custom_script_loader.cpp |  6 ++-
- src/server/scripts/Custom/killstreak.cpp           | 62 ++++++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |  6 +-
+ src/server/scripts/Custom/killstreak.cpp      | 62 +++++++++++++++++++
  2 files changed, 66 insertions(+), 2 deletions(-)
  create mode 100644 src/server/scripts/Custom/killstreak.cpp
 
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..a53a5cf762 100644
+index b6b83ac184..0c76f64bd4 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -167,7 +167,8 @@
@@ -103,5 +103,5 @@ index 0000000000..46119543fb
 +}
 \ No newline at end of file
 -- 
-2.11.0
+2.20.1
 
