@@ -1,14 +1,14 @@
-From dca77fd3816b320ebf4476f410cf324e52af1fdf Mon Sep 17 00:00:00 2001
+From 0bf2dc93ddc4349f624dea15eb9fd73c07ba597f Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Sun, 30 Sep 2018 13:48:18 -0500
-Subject: [PATCH] 2018_09_27-GuildHouses
+Date: Thu, 13 Feb 2020 00:15:37 -0600
+Subject: [PATCH] 2020_01_31-GuildHouses
 
 ---
- .../Guildhouses/world_guildhouses.sql              |  67 ++++
- src/server/scripts/Custom/LordPsyan-GuildHouses.h  |   9 +
- src/server/scripts/Custom/custom_script_loader.cpp |   6 +-
- src/server/scripts/Custom/guildmaster.cpp          | 336 +++++++++++++++++++++
- src/server/worldserver/worldserver.conf.dist       |  30 ++
+ .../Guildhouses/world_guildhouses.sql         |  67 ++++
+ .../scripts/Custom/LordPsyan-GuildHouses.h    |   9 +
+ .../scripts/Custom/custom_script_loader.cpp   |   6 +-
+ src/server/scripts/Custom/guildmaster.cpp     | 336 ++++++++++++++++++
+ src/server/worldserver/worldserver.conf.dist  |  30 ++
  5 files changed, 446 insertions(+), 2 deletions(-)
  create mode 100644 sql/LordPsyan-Patches/Guildhouses/world_guildhouses.sql
  create mode 100644 src/server/scripts/Custom/LordPsyan-GuildHouses.h
@@ -104,7 +104,7 @@ index 0000000000..b2fa1289c3
 +#include "DatabaseEnv.h"
 +#include "DBCStores.h"
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..fe8a4cc32f 100644
+index b6b83ac184..407eff0737 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -32,7 +32,8 @@
@@ -470,10 +470,10 @@ index 0000000000..c11536e7a1
 + new guildmaster();
 +}
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index 6ee9e3158c..32dfe4ab93 100644
+index afa4fcccce..f1217944ba 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -4016,6 +4016,36 @@ Metric.OverallStatusInterval = 1
+@@ -4096,6 +4096,36 @@ Metric.OverallStatusInterval = 1
  #
  ###################################################################################################
  
@@ -511,5 +511,5 @@ index 6ee9e3158c..32dfe4ab93 100644
  # Prepatch by LordPsyan.
  # See http://www.realmsofwarcraft.com/bb for forums and information.
 -- 
-2.11.0
+2.20.1
 
