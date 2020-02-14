@@ -1,15 +1,15 @@
-From db87e511066e708d4ba437d730401cb337263c21 Mon Sep 17 00:00:00 2001
+From ac6f0eff2b7b1601d47782de3828c5aecfd27d5b Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Tue, 2 Oct 2018 14:22:36 -0500
-Subject: [PATCH] 2018_09_27-Profession_NPC
+Date: Fri, 14 Feb 2020 02:26:51 -0600
+Subject: [PATCH] 2020_01_31-Profession_NPC.
 
 ---
- .../world/world.profession_npc.sql                 |   4 +
- src/server/game/World/World.cpp                    |   8 +-
- src/server/game/World/World.h                      |  10 +-
- src/server/scripts/Custom/custom_script_loader.cpp |   6 +-
- src/server/scripts/Custom/professionnpc.cpp        | 425 +++++++++++++++++++++
- src/server/worldserver/worldserver.conf.dist       |  47 +++
+ .../world/world.profession_npc.sql            |   4 +
+ src/server/game/World/World.cpp               |   8 +-
+ src/server/game/World/World.h                 |  10 +-
+ .../scripts/Custom/custom_script_loader.cpp   |   6 +-
+ src/server/scripts/Custom/professionnpc.cpp   | 425 ++++++++++++++++++
+ src/server/worldserver/worldserver.conf.dist  |  47 ++
  6 files changed, 495 insertions(+), 5 deletions(-)
  create mode 100644 sql/LordPsyan-Patches/world/world.profession_npc.sql
  create mode 100644 src/server/scripts/Custom/professionnpc.cpp
@@ -25,10 +25,10 @@ index 0000000000..45212e7fc7
 +('60001','0','0','0','0','0','18','0','18','0','Cyon','Profession master','','0','59','61','0','35','1','1.48','1.14286','0','0','0','1500','1900','1','1','1','0','0','0','0','0','0','0','0','7','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','','1','1','1','1','1','1','1','0','0','1','0','0','professionnpc','1');
 +-- end
 diff --git a/src/server/game/World/World.cpp b/src/server/game/World/World.cpp
-index 82dbe507d3..759a27deeb 100644
+index 86c38d6aa4..eca1c39d5a 100644
 --- a/src/server/game/World/World.cpp
 +++ b/src/server/game/World/World.cpp
-@@ -1277,7 +1277,13 @@ void World::LoadConfigSettings(bool reload)
+@@ -1316,7 +1316,13 @@ void World::LoadConfigSettings(bool reload)
      // 30
      // 31
      // 32
@@ -44,10 +44,10 @@ index 82dbe507d3..759a27deeb 100644
      // 35
      // 36
 diff --git a/src/server/game/World/World.h b/src/server/game/World/World.h
-index c0cb58fc77..a5c04659cf 100644
+index 975cd0d06f..a4e16f25a9 100644
 --- a/src/server/game/World/World.h
 +++ b/src/server/game/World/World.h
-@@ -192,7 +192,10 @@ enum WorldBoolConfigs
+@@ -190,7 +190,10 @@ enum WorldBoolConfigs
      // 27
      // 28
      // 29
@@ -59,7 +59,7 @@ index c0cb58fc77..a5c04659cf 100644
      // 31
      // 32
      // 33
-@@ -488,7 +491,10 @@ enum WorldIntConfigs
+@@ -491,7 +494,10 @@ enum WorldIntConfigs
      // 86
      // 87
      // 88
@@ -72,7 +72,7 @@ index c0cb58fc77..a5c04659cf 100644
      // 91
      // 92
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..b5ca1f4fbd 100644
+index b6b83ac184..0948de9b92 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -40,7 +40,8 @@
@@ -527,13 +527,15 @@ index 0000000000..cd15eb96c1
 +
 +}
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index 6ee9e3158c..55006cd895 100644
+index afa4fcccce..1b038c96cd 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -10,6 +10,53 @@
+@@ -8,6 +8,53 @@
+ #       http://www.realmsofwarcraft.com/       #
+ ################################################
  
- ###################################################################################################
- #
++###################################################################################################
++#
 +#       Profession NPC
 +#
 +# Enable or Disable Primary Professions
@@ -579,11 +581,9 @@ index 6ee9e3158c..55006cd895 100644
 +#
 +###################################################################################################
 +
-+###################################################################################################
-+#
+ ###################################################################################################
+ #
  # Prepatch Configuration
- #
- #
 -- 
-2.11.0
+2.20.1
 
