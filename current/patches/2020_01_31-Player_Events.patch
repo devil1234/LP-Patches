@@ -1,13 +1,13 @@
-From 4c96ef1ec04bed45c67efd3268af0cd1d52f7174 Mon Sep 17 00:00:00 2001
+From 8898f089543dca3a4e11c0b4c960d75cfb87d3ab Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Tue, 2 Oct 2018 14:24:44 -0500
-Subject: [PATCH] 2018_09_27-Player_Events
+Date: Fri, 14 Feb 2020 01:55:47 -0600
+Subject: [PATCH] 2020_01_31-Player_Events
 
 ---
- event_readme.txt                                   | 208 +++++++
- .../Player_Events/world.player_events.sql          |  75 +++
- src/server/scripts/Custom/custom_script_loader.cpp |   6 +-
- src/server/scripts/Custom/event.cpp                | 655 +++++++++++++++++++++
+ event_readme.txt                              | 208 ++++++
+ .../Player_Events/world.player_events.sql     |  75 ++
+ .../scripts/Custom/custom_script_loader.cpp   |   6 +-
+ src/server/scripts/Custom/event.cpp           | 655 ++++++++++++++++++
  4 files changed, 942 insertions(+), 2 deletions(-)
  create mode 100644 event_readme.txt
  create mode 100644 sql/TrinityCore-Patches/Player_Events/world.player_events.sql
@@ -310,7 +310,7 @@ index 0000000000..1e76146c20
 +INSERT INTO `lil_events` VALUES ('0', '0', '0', '0');
 +INSERT INTO `lil_events` VALUES ('1', '1', '1', '1');
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..15bc41f0d1 100644
+index b6b83ac184..bd78e5f1d3 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -171,7 +171,8 @@
@@ -335,7 +335,7 @@ index 5412cf1942..15bc41f0d1 100644
  // end159
 diff --git a/src/server/scripts/Custom/event.cpp b/src/server/scripts/Custom/event.cpp
 new file mode 100644
-index 0000000000..e1a3dc8254
+index 0000000000..ace60ba1bd
 --- /dev/null
 +++ b/src/server/scripts/Custom/event.cpp
 @@ -0,0 +1,655 @@
@@ -500,13 +500,13 @@ index 0000000000..e1a3dc8254
 +            return false;
 +        }
 +
-+        if (pPlayer->getRace() != PRace && PRace != 0)
++        if (pPlayer->GetRace() != PRace && PRace != 0)
 +        {
 +            LILLOG("Condition Failed! Wrong race");
 +            return false;
 +        }
 +
-+        if (pPlayer->getClass() != PClass && PClass != 0)
++        if (pPlayer->GetClass() != PClass && PClass != 0)
 +        {
 +            LILLOG("Condition Failed! Wrong class");
 +            return false;
@@ -884,7 +884,7 @@ index 0000000000..e1a3dc8254
 +
 +    void OnLevelChanged(Player* pPlayer, uint8)
 +    {
-+        sLilEvents->HandleEvent(pPlayer, Lil::LEVENT_LEVELUP, pPlayer->getLevel());
++        sLilEvents->HandleEvent(pPlayer, Lil::LEVENT_LEVELUP, pPlayer->GetLevel());
 +    }
 +
 +    void OnCreatureKill(Player* pPlayer, Creature* pCreature)
@@ -996,5 +996,5 @@ index 0000000000..e1a3dc8254
 +}
 \ No newline at end of file
 -- 
-2.11.0
+2.20.1
 
