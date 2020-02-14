@@ -1,19 +1,19 @@
-From 82e8b32e6065725c00b3768ca748fec45b6fc36b Mon Sep 17 00:00:00 2001
+From ab4ad8cb1039bda0bd46a75f0fe20a4f1b766806 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Tue, 2 Oct 2018 13:22:37 -0500
-Subject: [PATCH] 2018_09_27-PlayedTime
+Date: Fri, 14 Feb 2020 01:34:44 -0600
+Subject: [PATCH] 2020_01_31-PlayedTime
 
 ---
- src/server/game/Entities/Player/Player.cpp   | 21 +++++++++++++++++++++
+ src/server/game/Entities/Player/Player.cpp   | 21 ++++++++++++++++++++
  src/server/game/Entities/Player/Player.h     |  6 ++++++
  src/server/worldserver/worldserver.conf.dist |  9 +++++++++
  3 files changed, 36 insertions(+)
 
 diff --git a/src/server/game/Entities/Player/Player.cpp b/src/server/game/Entities/Player/Player.cpp
-index 467fb9f23b..c58ab78dba 100644
+index 30444f2f2f..df80ed1fef 100644
 --- a/src/server/game/Entities/Player/Player.cpp
 +++ b/src/server/game/Entities/Player/Player.cpp
-@@ -288,6 +288,12 @@ Player::Player(WorldSession* session): Unit(true)
+@@ -291,6 +291,12 @@ Player::Player(WorldSession* session): Unit(true)
          m_bgBattlegroundQueueID[j].invitedToInstance = 0;
      }
  
@@ -49,10 +49,10 @@ index 467fb9f23b..c58ab78dba 100644
      {
          QuestSet::iterator iter = m_timedquests.begin();
 diff --git a/src/server/game/Entities/Player/Player.h b/src/server/game/Entities/Player/Player.h
-index f233596c7e..e453c632f0 100644
+index aebd7bf358..53af2e35f9 100644
 --- a/src/server/game/Entities/Player/Player.h
 +++ b/src/server/game/Entities/Player/Player.h
-@@ -983,6 +983,12 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
+@@ -976,6 +976,12 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
          void SetCommandStatusOn(uint32 command) { _activeCheats |= command; }
          void SetCommandStatusOff(uint32 command) { _activeCheats &= ~command; }
  
@@ -66,13 +66,15 @@ index f233596c7e..e453c632f0 100644
          time_t m_logintime;
          time_t m_Last_tick;
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index 6ee9e3158c..09ec08ac35 100644
+index afa4fcccce..c37881de0c 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -4015,6 +4015,15 @@ Metric.OverallStatusInterval = 1
+@@ -4093,6 +4093,15 @@ Metric.ConnectionInfo = "127.0.0.1;8086;worldserver"
  
- #
- ###################################################################################################
+ Metric.OverallStatusInterval = 1
+ 
++#
++###################################################################################################
 +#
 +
 +PlayedTimeReward.Interval = 0
@@ -80,11 +82,9 @@ index 6ee9e3158c..09ec08ac35 100644
 +PlayedTimeReward.Honor    = 0
 +PlayedTimeReward.Arena    = 0
 +
-+#
-+###################################################################################################
- 
  #
- # Prepatch by LordPsyan.
+ ###################################################################################################
+ 
 -- 
-2.11.0
+2.20.1
 
