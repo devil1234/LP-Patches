@@ -1,36 +1,36 @@
-From 3bea32425a0cc5c1326e730594e13525489cceeb Mon Sep 17 00:00:00 2001
+From 18c55146f492c761d3f70b84243e8df2a3072725 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Tue, 2 Oct 2018 21:18:05 -0500
-Subject: [PATCH] 2018_09_27-TrinityIRC
+Date: Fri, 14 Feb 2020 05:38:38 -0600
+Subject: [PATCH] 2020_01_31-TrinityIRC
 
 ---
- .../TriniIRC/World_TrinityChat.sql                 |   81 +
- src/server/game/Chat/Channels/Channel.cpp          |    5 +
- src/server/game/Chat/Chat.cpp                      |   41 +
- src/server/game/Chat/Chat.h                        |    3 +
- src/server/game/Entities/Player/Player.cpp         |   21 +
- src/server/game/Entities/Player/Player.h           |    3 +-
- src/server/game/Events/GameEventMgr.cpp            |    7 +
- src/server/game/Handlers/AuctionHouseHandler.cpp   |    4 +-
- src/server/game/Handlers/ChatHandler.cpp           |    3 +-
- src/server/game/TriniChat/IRCClient.cpp            |  135 ++
- src/server/game/TriniChat/IRCClient.h              |  290 +++
- src/server/game/TriniChat/IRCCmd.cpp               |  860 +++++++
- src/server/game/TriniChat/IRCCmd.h                 |  144 ++
- src/server/game/TriniChat/IRCCmde.cpp              | 2354 ++++++++++++++++++++
- src/server/game/TriniChat/IRCFunc.h                |  293 +++
- src/server/game/TriniChat/IRCIO.cpp                |  532 +++++
- src/server/game/TriniChat/IRCLog.cpp               |   81 +
- src/server/game/TriniChat/IRCLog.h                 |   40 +
- src/server/game/TriniChat/IRCSock.cpp              |  160 ++
- src/server/game/TriniChat/MCS_OnlinePlayers.cpp    |   94 +
- src/server/game/TriniChat/MCS_OnlinePlayers.h      |   38 +
- src/server/game/World/World.cpp                    |  190 +-
- src/server/game/World/World.h                      |    4 +
- src/server/scripts/Commands/cs_message.cpp         |   19 +
- src/server/worldserver/CommandLine/CliRunnable.cpp |    9 +
- src/server/worldserver/Main.cpp                    |   24 +-
- src/server/worldserver/worldserver.conf.dist       |  276 ++-
+ .../TriniIRC/World_TrinityChat.sql            |   81 +
+ src/server/game/Chat/Channels/Channel.cpp     |    5 +
+ src/server/game/Chat/Chat.cpp                 |   41 +
+ src/server/game/Chat/Chat.h                   |    3 +
+ src/server/game/Entities/Player/Player.cpp    |   21 +
+ src/server/game/Entities/Player/Player.h      |    3 +-
+ src/server/game/Events/GameEventMgr.cpp       |    7 +
+ .../game/Handlers/AuctionHouseHandler.cpp     |    4 +-
+ src/server/game/Handlers/ChatHandler.cpp      |    3 +-
+ src/server/game/TriniChat/IRCClient.cpp       |  135 +
+ src/server/game/TriniChat/IRCClient.h         |  290 ++
+ src/server/game/TriniChat/IRCCmd.cpp          |  860 ++++++
+ src/server/game/TriniChat/IRCCmd.h            |  144 +
+ src/server/game/TriniChat/IRCCmde.cpp         | 2354 +++++++++++++++++
+ src/server/game/TriniChat/IRCFunc.h           |  293 ++
+ src/server/game/TriniChat/IRCIO.cpp           |  532 ++++
+ src/server/game/TriniChat/IRCLog.cpp          |   81 +
+ src/server/game/TriniChat/IRCLog.h            |   40 +
+ src/server/game/TriniChat/IRCSock.cpp         |  160 ++
+ .../game/TriniChat/MCS_OnlinePlayers.cpp      |   94 +
+ src/server/game/TriniChat/MCS_OnlinePlayers.h |   38 +
+ src/server/game/World/World.cpp               |  190 +-
+ src/server/game/World/World.h                 |    4 +
+ src/server/scripts/Commands/cs_message.cpp    |   19 +
+ .../worldserver/CommandLine/CliRunnable.cpp   |    9 +
+ src/server/worldserver/Main.cpp               |   24 +-
+ src/server/worldserver/worldserver.conf.dist  |  276 +-
  27 files changed, 5703 insertions(+), 8 deletions(-)
  create mode 100644 sql/TrinityCore-Patches/TriniIRC/World_TrinityChat.sql
  create mode 100644 src/server/game/TriniChat/IRCClient.cpp
@@ -134,7 +134,7 @@ index 0000000000..48dd18e29d
 +INSERT INTO `trinity_string` VALUES ('6611', '|cffff0000[Server Event]: %s|r', null, null, null, null, null, null, null, null);
 +INSERT INTO `trinity_string` VALUES ('6612', '|cffff0000[Automatic]: %s|r', null, null, null, null, null, null, null, null);
 diff --git a/src/server/game/Chat/Channels/Channel.cpp b/src/server/game/Chat/Channels/Channel.cpp
-index e2adcb82ff..d9c91e4481 100644
+index 1af905546b..d44b6288d7 100644
 --- a/src/server/game/Chat/Channels/Channel.cpp
 +++ b/src/server/game/Chat/Channels/Channel.cpp
 @@ -29,6 +29,7 @@
@@ -145,7 +145,7 @@ index e2adcb82ff..d9c91e4481 100644
  #include "SocialMgr.h"
  #include "World.h"
  
-@@ -244,6 +245,8 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
+@@ -212,6 +213,8 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
  
      JoinNotify(guid);
  
@@ -154,7 +154,7 @@ index e2adcb82ff..d9c91e4481 100644
      // Custom channel handling
      if (!IsConstant())
      {
-@@ -297,6 +300,8 @@ void Channel::LeaveChannel(Player* player, bool send)
+@@ -262,6 +265,8 @@ void Channel::LeaveChannel(Player* player, bool send)
          SendToAll(builder);
      }
  
@@ -164,10 +164,10 @@ index e2adcb82ff..d9c91e4481 100644
  
      if (!IsConstant())
 diff --git a/src/server/game/Chat/Chat.cpp b/src/server/game/Chat/Chat.cpp
-index ec4b799db5..98f2e53150 100644
+index 88fbc98ff2..5ce7dc7309 100644
 --- a/src/server/game/Chat/Chat.cpp
 +++ b/src/server/game/Chat/Chat.cpp
-@@ -33,6 +33,7 @@
+@@ -32,6 +32,7 @@
  #include "ScriptMgr.h"
  #include "World.h"
  #include <boost/algorithm/string/replace.hpp>
@@ -175,7 +175,7 @@ index ec4b799db5..98f2e53150 100644
  
  // Lazy loading of the command table cache from commands and the
  // ScriptMgr should be thread safe since the player commands,
-@@ -333,6 +334,14 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
+@@ -303,6 +304,14 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
                      areaId, areaName.c_str(), zoneName.c_str(),
                      (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "",
                      guid.ToString().c_str());
@@ -190,7 +190,7 @@ index ec4b799db5..98f2e53150 100644
              }
          }
          // some commands have custom error messages. Don't send the default one in these cases.
-@@ -819,6 +828,38 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes,
+@@ -789,6 +798,38 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes,
      return nullptr;
  }
  
@@ -230,10 +230,10 @@ index ec4b799db5..98f2e53150 100644
  {
      if (!m_session)
 diff --git a/src/server/game/Chat/Chat.h b/src/server/game/Chat/Chat.h
-index 9c08b9c0f2..325766b88b 100644
+index e6c9621256..9d01457871 100644
 --- a/src/server/game/Chat/Chat.h
 +++ b/src/server/game/Chat/Chat.h
-@@ -24,6 +24,7 @@
+@@ -23,6 +23,7 @@
  #include "ObjectGuid.h"
  #include "SharedDefines.h"
  #include "StringFormat.h"
@@ -241,7 +241,7 @@ index 9c08b9c0f2..325766b88b 100644
  #include <string>
  #include <vector>
  
-@@ -190,4 +191,6 @@ class TC_GAME_API AddonChannelCommandHandler : public ChatHandler
+@@ -189,4 +190,6 @@ class TC_GAME_API AddonChannelCommandHandler : public ChatHandler
          bool humanReadable = false;
  };
  
@@ -249,10 +249,10 @@ index 9c08b9c0f2..325766b88b 100644
 +
  #endif
 diff --git a/src/server/game/Entities/Player/Player.cpp b/src/server/game/Entities/Player/Player.cpp
-index 467fb9f23b..13bb49aef7 100644
+index 30444f2f2f..ff81c65b6f 100644
 --- a/src/server/game/Entities/Player/Player.cpp
 +++ b/src/server/game/Entities/Player/Player.cpp
-@@ -34,6 +34,7 @@
+@@ -33,6 +33,7 @@
  #include "CharacterCache.h"
  #include "CharacterDatabaseCleaner.h"
  #include "Chat.h"
@@ -260,7 +260,7 @@ index 467fb9f23b..13bb49aef7 100644
  #include "CinematicMgr.h"
  #include "Common.h"
  #include "ConditionMgr.h"
-@@ -2544,6 +2545,15 @@ void Player::UninviteFromGroup()
+@@ -2546,6 +2547,15 @@ void Player::UninviteFromGroup()
              delete group;
          }
      }
@@ -276,7 +276,7 @@ index 467fb9f23b..13bb49aef7 100644
  }
  
  void Player::RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method /*= GROUP_REMOVEMETHOD_DEFAULT*/, ObjectGuid kicker /*= ObjectGuid::Empty*/, char const* reason /*= nullptr*/)
-@@ -2681,6 +2691,17 @@ void Player::GiveLevel(uint8 level)
+@@ -2682,6 +2692,17 @@ void Player::GiveLevel(uint8 level)
      InitTaxiNodesForLevel();
      InitGlyphsForLevel();
  
@@ -295,10 +295,10 @@ index 467fb9f23b..13bb49aef7 100644
  
      if (sWorld->getBoolConfig(CONFIG_ALWAYS_MAXSKILL)) // Max weapon skill when leveling up
 diff --git a/src/server/game/Entities/Player/Player.h b/src/server/game/Entities/Player/Player.h
-index f233596c7e..df6791f1af 100644
+index aebd7bf358..5f442afd73 100644
 --- a/src/server/game/Entities/Player/Player.h
 +++ b/src/server/game/Entities/Player/Player.h
-@@ -2522,7 +2522,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
+@@ -2532,7 +2532,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
          // 32
          // 33
          // 34
@@ -309,10 +309,10 @@ index f233596c7e..df6791f1af 100644
          // 37
          // 38
 diff --git a/src/server/game/Events/GameEventMgr.cpp b/src/server/game/Events/GameEventMgr.cpp
-index 89c9d27efe..4692de0155 100644
+index 910f740341..f582e769d2 100644
 --- a/src/server/game/Events/GameEventMgr.cpp
 +++ b/src/server/game/Events/GameEventMgr.cpp
-@@ -22,6 +22,7 @@
+@@ -21,6 +21,7 @@
  #include "DBCStores.h"
  #include "DatabaseEnv.h"
  #include "GameObjectAI.h"
@@ -320,7 +320,7 @@ index 89c9d27efe..4692de0155 100644
  #include "GameTime.h"
  #include "Language.h"
  #include "Log.h"
-@@ -1155,6 +1156,12 @@ void GameEventMgr::ApplyNewEvent(uint16 event_id)
+@@ -1168,6 +1169,12 @@ void GameEventMgr::ApplyNewEvent(uint16 event_id)
      uint8 announce = mGameEvent[event_id].announce;
      if (announce == 1 || (announce == 2 && sWorld->getBoolConfig(CONFIG_EVENT_ANNOUNCE)))
          sWorld->SendWorldText(LANG_EVENTMESSAGE, mGameEvent[event_id].description.c_str());
@@ -334,10 +334,10 @@ index 89c9d27efe..4692de0155 100644
      TC_LOG_INFO("gameevent", "GameEvent %u \"%s\" started.", event_id, mGameEvent[event_id].description.c_str());
  
 diff --git a/src/server/game/Handlers/AuctionHouseHandler.cpp b/src/server/game/Handlers/AuctionHouseHandler.cpp
-index a95af0a143..32c248b235 100644
+index d7fa749452..994a9ee66f 100644
 --- a/src/server/game/Handlers/AuctionHouseHandler.cpp
 +++ b/src/server/game/Handlers/AuctionHouseHandler.cpp
-@@ -25,6 +25,7 @@
+@@ -24,6 +24,7 @@
  #include "DBCStructure.h"
  #include "GameTime.h"
  #include "Item.h"
@@ -345,7 +345,7 @@ index a95af0a143..32c248b235 100644
  #include "Language.h"
  #include "Log.h"
  #include "Mail.h"
-@@ -626,7 +627,8 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
+@@ -625,7 +626,8 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
      SendAuctionCommandResult(auction->Id, AUCTION_CANCEL, ERR_AUCTION_OK);
  
      // Now remove the auction
@@ -356,10 +356,10 @@ index a95af0a143..32c248b235 100644
      auction->DeleteFromDB(trans);
      CharacterDatabase.CommitTransaction(trans);
 diff --git a/src/server/game/Handlers/ChatHandler.cpp b/src/server/game/Handlers/ChatHandler.cpp
-index d7ac3e506a..2d3bd73951 100644
+index 181b5d13ef..3d2b407ae9 100644
 --- a/src/server/game/Handlers/ChatHandler.cpp
 +++ b/src/server/game/Handlers/ChatHandler.cpp
-@@ -46,7 +46,7 @@
+@@ -45,7 +45,7 @@
  // Prepatch by LordPsyan
  // 61
  // 62
@@ -368,7 +368,7 @@ index d7ac3e506a..2d3bd73951 100644
  // 64
  // 65
  // 66
-@@ -530,6 +530,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
+@@ -534,6 +534,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
  
              if (Channel* chn = ChannelMgr::GetChannelForPlayerByNamePart(channel, sender))
              {
@@ -1831,7 +1831,7 @@ index 0000000000..6921f8c6a4
 +#endif
 diff --git a/src/server/game/TriniChat/IRCCmde.cpp b/src/server/game/TriniChat/IRCCmde.cpp
 new file mode 100644
-index 0000000000..6b5772c661
+index 0000000000..af765db2f4
 --- /dev/null
 +++ b/src/server/game/TriniChat/IRCCmde.cpp
 @@ -0,0 +1,2354 @@
@@ -3398,7 +3398,7 @@ index 0000000000..6b5772c661
 +    {
 +        Player *chr = ObjectAccessor::FindPlayer(guid);
 +        ObjectGuid level = ObjectGuid::Empty;
-+        int32 i_oldlvl = chr ? chr->getLevel() : sCharacterCache->GetCharacterLevelByGuid(level);
++        int32 i_oldlvl = chr ? chr->GetLevel() : sCharacterCache->GetCharacterLevelByGuid(level);
 +
 +        if (chr)
 +        {
@@ -4191,7 +4191,7 @@ index 0000000000..6b5772c661
 +}
 diff --git a/src/server/game/TriniChat/IRCFunc.h b/src/server/game/TriniChat/IRCFunc.h
 new file mode 100644
-index 0000000000..f146ffad8b
+index 0000000000..3daa9d2b9c
 --- /dev/null
 +++ b/src/server/game/TriniChat/IRCFunc.h
 @@ -0,0 +1,293 @@
@@ -4407,26 +4407,26 @@ index 0000000000..f146ffad8b
 +        sMsg = sIRC->MakeMsg(sMsg, "$Tag", "<DND>");
 +    else
 +        sMsg = sIRC->MakeMsg(sMsg, "$Tag", "");
-+    sMsg = sIRC->MakeMsg(sMsg, "$Level", MakeMsgA("%d", plr->getLevel()));
-+    if (plr->getClass() == 1)
++    sMsg = sIRC->MakeMsg(sMsg, "$Level", MakeMsgA("%d", plr->GetLevel()));
++    if (plr->GetClass() == 1)
 +        sMsg = sIRC->MakeMsg(sMsg, "$Class", MakeMsgA("\0035WR\003"));
-+    else if (plr->getClass() == 2)
++    else if (plr->GetClass() == 2)
 +        sMsg = sIRC->MakeMsg(sMsg, "$Class", MakeMsgA("\00313PA\003"));
-+    else if (plr->getClass() == 3)
++    else if (plr->GetClass() == 3)
 +        sMsg = sIRC->MakeMsg(sMsg, "$Class", MakeMsgA("\0033HU\003"));
-+    else if (plr->getClass() == 4)
++    else if (plr->GetClass() == 4)
 +        sMsg = sIRC->MakeMsg(sMsg, "$Class", MakeMsgA("\00310RO\003"));
-+    else if (plr->getClass() == 5)
++    else if (plr->GetClass() == 5)
 +        sMsg = sIRC->MakeMsg(sMsg, "$Class", MakeMsgA("\00314PR\003"));
-+    else if (plr->getClass() == 6)
++    else if (plr->GetClass() == 6)
 +        sMsg = sIRC->MakeMsg(sMsg, "$Class", MakeMsgA("\0034DK\003"));
-+    else if (plr->getClass() == 7)
++    else if (plr->GetClass() == 7)
 +        sMsg = sIRC->MakeMsg(sMsg, "$Class", MakeMsgA("\00312SH\003"));
-+    else if (plr->getClass() == 8)
++    else if (plr->GetClass() == 8)
 +        sMsg = sIRC->MakeMsg(sMsg, "$Class", MakeMsgA("\00311MA\003"));
-+    else if (plr->getClass() == 9)
++    else if (plr->GetClass() == 9)
 +        sMsg = sIRC->MakeMsg(sMsg, "$Class", MakeMsgA("\0036WL\003"));
-+    else if (plr->getClass() == 11)
++    else if (plr->GetClass() == 11)
 +        sMsg = sIRC->MakeMsg(sMsg, "$Class", MakeMsgA("\0037DR\003"));
 +    sMsg = Delink(sMsg);
 +    sMsg = WoWcol2IRC(sMsg);
@@ -5327,7 +5327,7 @@ index 0000000000..e3bde2bce2
 +}
 diff --git a/src/server/game/TriniChat/MCS_OnlinePlayers.cpp b/src/server/game/TriniChat/MCS_OnlinePlayers.cpp
 new file mode 100644
-index 0000000000..5bc80740f3
+index 0000000000..e9d37a35ac
 --- /dev/null
 +++ b/src/server/game/TriniChat/MCS_OnlinePlayers.cpp
 @@ -0,0 +1,94 @@
@@ -5408,7 +5408,7 @@ index 0000000000..5bc80740f3
 +                case 469:ChatTag.append("\00312");break;    //alliance
 +            }
 +
-+            IRCOut.append(IRCCmd::MakeMsg("%s\002%s\003\017\002(%d)\002\017", ChatTag.c_str(), plr->GetName().c_str(), plr->getLevel()));
++            IRCOut.append(IRCCmd::MakeMsg("%s\002%s\003\017\002(%d)\002\017", ChatTag.c_str(), plr->GetName().c_str(), plr->GetLevel()));
 +
 +            // after XX players have been added to the string
 +            // output to irc and reset for the next XX
@@ -5470,7 +5470,7 @@ index 0000000000..700d730b2d
 +
 +#endif
 diff --git a/src/server/game/World/World.cpp b/src/server/game/World/World.cpp
-index 82dbe507d3..d0d3550e91 100644
+index 86c38d6aa4..f0dca0aab8 100644
 --- a/src/server/game/World/World.cpp
 +++ b/src/server/game/World/World.cpp
 @@ -89,7 +89,7 @@
@@ -5482,7 +5482,7 @@ index 82dbe507d3..d0d3550e91 100644
  // 04
  // 05
  // 06
-@@ -1551,6 +1551,168 @@ void World::LoadConfigSettings(bool reload)
+@@ -1590,6 +1590,168 @@ void World::LoadConfigSettings(bool reload)
      // call ScriptMgr if we're reloading the configuration
      if (reload)
          sScriptMgr->OnConfigLoad(reload);
@@ -5651,7 +5651,7 @@ index 82dbe507d3..d0d3550e91 100644
  }
  
  /// Initialize the World
-@@ -1574,6 +1736,7 @@ void World::SetInitialWorldSettings()
+@@ -1616,6 +1778,7 @@ void World::SetInitialWorldSettings()
  
      ///- Initialize config settings
      LoadConfigSettings();
@@ -5659,26 +5659,26 @@ index 82dbe507d3..d0d3550e91 100644
  
      ///- Initialize Allowed Security Level
      LoadDBAllowedSecurityLevel();
-@@ -2097,6 +2260,9 @@ void World::SetInitialWorldSettings()
+@@ -2149,6 +2312,9 @@ void World::SetInitialWorldSettings()
      LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES(%u, %u, 0, '%s')",
                              realm.Id.Realm, uint32(GameTime::GetStartTime()), GitRevision::GetFullVersion());       // One-time query
  
 +    static uint32 autoanc = 1;
 +    autoanc = sIRC->autoanc;
 +
-     m_timers[WUPDATE_WEATHERS].SetInterval(1*IN_MILLISECONDS);
      m_timers[WUPDATE_AUCTIONS].SetInterval(MINUTE*IN_MILLISECONDS);
      m_timers[WUPDATE_AUCTIONS_PENDING].SetInterval(250);
-@@ -2118,6 +2284,8 @@ void World::SetInitialWorldSettings()
+     m_timers[WUPDATE_UPTIME].SetInterval(m_int_configs[CONFIG_UPTIME_UPDATE]*MINUTE*IN_MILLISECONDS);
+@@ -2171,6 +2337,8 @@ void World::SetInitialWorldSettings()
  
-     m_timers[WUPDATE_WHO_LIST].SetInterval(5 * IN_MILLISECONDS); // update who list cache every 5 seconds
+     m_timers[WUPDATE_CHANNEL_SAVE].SetInterval(getIntConfig(CONFIG_PRESERVE_CUSTOM_CHANNEL_INTERVAL) * MINUTE * IN_MILLISECONDS);
  
 +    m_timers[WUPDATE_AUTOANC].SetInterval(autoanc*MINUTE*1000);
 +
      //to set mailtimer to return mails every day between 4 and 5 am
      //mailtimer is increased when updating auctions
      //one second is 1000 -(tested on win system)
-@@ -2498,6 +2666,12 @@ void World::Update(uint32 diff)
+@@ -2546,6 +2714,12 @@ void World::Update(uint32 diff)
          WorldDatabase.KeepAlive();
      }
  
@@ -5691,7 +5691,7 @@ index 82dbe507d3..d0d3550e91 100644
      // update the instance reset times
      sInstanceSaveMgr->Update();
  
-@@ -3132,6 +3306,20 @@ void World::SendAutoBroadcast()
+@@ -3175,6 +3349,20 @@ void World::SendAutoBroadcast()
      TC_LOG_DEBUG("misc", "AutoBroadcast: '%s'", msg.c_str());
  }
  
@@ -5713,10 +5713,10 @@ index 82dbe507d3..d0d3550e91 100644
  {
      PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_COUNT);
 diff --git a/src/server/game/World/World.h b/src/server/game/World/World.h
-index c0cb58fc77..bf46ba1782 100644
+index 975cd0d06f..d36c886783 100644
 --- a/src/server/game/World/World.h
 +++ b/src/server/game/World/World.h
-@@ -77,6 +77,7 @@ enum WorldTimers
+@@ -75,6 +75,7 @@ enum WorldTimers
      WUPDATE_EVENTS,
      WUPDATE_CLEANDB,
      WUPDATE_AUTOBROADCAST,
@@ -5724,7 +5724,7 @@ index c0cb58fc77..bf46ba1782 100644
      WUPDATE_MAILBOXQUEUE,
      WUPDATE_DELETECHARS,
      WUPDATE_AHBOT,
-@@ -708,6 +709,9 @@ class TC_GAME_API World
+@@ -714,6 +715,9 @@ class TC_GAME_API World
          void AddSession(WorldSession* s);
          void SendAutoBroadcast();
          bool RemoveSession(uint32 id);
@@ -5735,7 +5735,7 @@ index c0cb58fc77..bf46ba1782 100644
          void UpdateMaxSessionCounters();
          SessionMap const& GetAllSessions() const { return m_sessions; }
 diff --git a/src/server/scripts/Commands/cs_message.cpp b/src/server/scripts/Commands/cs_message.cpp
-index b7e060fcff..66c367d371 100644
+index 16a73a4f87..b504ab56c0 100644
 --- a/src/server/scripts/Commands/cs_message.cpp
 +++ b/src/server/scripts/Commands/cs_message.cpp
 @@ -158,6 +158,12 @@ public:
@@ -5779,10 +5779,10 @@ index b7e060fcff..66c367d371 100644
          std::string str = handler->GetTrinityString(LANG_GLOBAL_NOTIFY);
          str += args;
 diff --git a/src/server/worldserver/CommandLine/CliRunnable.cpp b/src/server/worldserver/CommandLine/CliRunnable.cpp
-index 4a499e5fc8..04762bf527 100644
+index dcfbd12cc4..49de492fb6 100644
 --- a/src/server/worldserver/CommandLine/CliRunnable.cpp
 +++ b/src/server/worldserver/CommandLine/CliRunnable.cpp
-@@ -28,6 +28,7 @@
+@@ -27,6 +27,7 @@
  #include "CliRunnable.h"
  #include "Log.h"
  #include "Util.h"
@@ -5790,7 +5790,7 @@ index 4a499e5fc8..04762bf527 100644
  
  #if TRINITY_PLATFORM != TRINITY_PLATFORM_WINDOWS
  #include <readline/readline.h>
-@@ -106,6 +107,14 @@ void commandFinished(void*, bool /*success*/)
+@@ -105,6 +106,14 @@ void commandFinished(void*, bool /*success*/)
      printf("TC> ");
      fflush(stdout);
  }
@@ -5806,18 +5806,18 @@ index 4a499e5fc8..04762bf527 100644
  #ifdef linux
  // Non-blocking keypress detector, when return pressed, return 1, else always return 0
 diff --git a/src/server/worldserver/Main.cpp b/src/server/worldserver/Main.cpp
-index 9bbb353cea..b585ef3d48 100644
+index 82909dd98b..761efd5be7 100644
 --- a/src/server/worldserver/Main.cpp
 +++ b/src/server/worldserver/Main.cpp
-@@ -50,6 +50,7 @@
+@@ -52,6 +52,7 @@
  #include "World.h"
  #include "WorldSocket.h"
  #include "WorldSocketMgr.h"
 +#include "IRCClient.h"
  #include <openssl/opensslv.h>
  #include <openssl/crypto.h>
- #include <boost/asio/deadline_timer.hpp>
-@@ -273,6 +274,15 @@ extern int main(int argc, char** argv)
+ #include <boost/asio/signal_set.hpp>
+@@ -279,6 +280,15 @@ extern int main(int argc, char** argv)
          });
      }
  
@@ -5833,7 +5833,7 @@ index 9bbb353cea..b585ef3d48 100644
      // Launch the worldserver listener socket
      uint16 worldPort = uint16(sWorld->getIntConfig(CONFIG_PORT_WORLD));
      std::string worldListener = sConfigMgr->GetStringDefault("BindIP", "0.0.0.0");
-@@ -291,13 +301,25 @@ extern int main(int argc, char** argv)
+@@ -299,13 +309,25 @@ extern int main(int argc, char** argv)
          return 1;
      }
  
@@ -5861,10 +5861,10 @@ index 9bbb353cea..b585ef3d48 100644
          ClearOnlineAccounts();
      });
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index 6ee9e3158c..b47c6a8cb0 100644
+index afa4fcccce..0c2feb5f15 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -3012,9 +3012,6 @@ CharDelete.DeathKnight.MinLevel = 0
+@@ -3056,9 +3056,6 @@ CharDelete.DeathKnight.MinLevel = 0
  
  CharDelete.KeepDays = 30
  
@@ -5874,7 +5874,7 @@ index 6ee9e3158c..b47c6a8cb0 100644
  ###################################################################################################
  # CUSTOM SERVER OPTIONS
  #
-@@ -4016,6 +4013,279 @@ Metric.OverallStatusInterval = 1
+@@ -4096,6 +4093,279 @@ Metric.OverallStatusInterval = 1
  #
  ###################################################################################################
  
@@ -6155,5 +6155,5 @@ index 6ee9e3158c..b47c6a8cb0 100644
  # Prepatch by LordPsyan.
  # See http://www.realmsofwarcraft.com/bb for forums and information.
 -- 
-2.11.0
+2.20.1
 
