@@ -1,16 +1,16 @@
-From 2d7e0030e51cd60331b38daa8e701b0e8fba90e0 Mon Sep 17 00:00:00 2001
+From 9211a902dd420072fe40441542d124cb45d9843f Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Wed, 3 Oct 2018 03:31:59 -0500
-Subject: [PATCH] 2018_09_27-TeleNPC3-SummonNPC
+Date: Fri, 14 Feb 2020 04:50:12 -0600
+Subject: [PATCH] 2020_01_31-TeleNPC3-SummonNPC
 
 ---
- README.NPCTELEPORT                                 |  14 +
- sql/LordPsyan-Patches/world/world_npc_teleport.sql | 158 ++++++++
- src/server/game/AI/ScriptedAI/sc_npc_teleport.cpp  | 432 +++++++++++++++++++++
- src/server/game/AI/ScriptedAI/sc_npc_teleport.h    | 168 ++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |  10 +-
- src/server/scripts/Custom/npc_teleport.cpp         | 273 +++++++++++++
- src/server/scripts/Custom/summon.cpp               |  46 +++
+ README.NPCTELEPORT                            |  14 +
+ .../world/world_npc_teleport.sql              | 158 +++++++
+ .../game/AI/ScriptedAI/sc_npc_teleport.cpp    | 432 ++++++++++++++++++
+ .../game/AI/ScriptedAI/sc_npc_teleport.h      | 168 +++++++
+ .../scripts/Custom/custom_script_loader.cpp   |  10 +-
+ src/server/scripts/Custom/npc_teleport.cpp    | 273 +++++++++++
+ src/server/scripts/Custom/summon.cpp          |  46 ++
  7 files changed, 1099 insertions(+), 2 deletions(-)
  create mode 100644 README.NPCTELEPORT
  create mode 100644 sql/LordPsyan-Patches/world/world_npc_teleport.sql
@@ -205,7 +205,7 @@ index 0000000000..527ecaf133
 +INSERT INTO `item_template` (`entry`, `class`, `subclass`, `SoundOverrideSubclass`, `name`, `displayid`, `Quality`, `Flags`, `FlagsExtra`, `BuyCount`, `BuyPrice`, `SellPrice`, `InventoryType`, `AllowableClass`, `AllowableRace`, `ItemLevel`, `RequiredLevel`, `RequiredSkill`, `RequiredSkillRank`, `requiredspell`, `requiredhonorrank`, `RequiredCityRank`, `RequiredReputationFaction`, `RequiredReputationRank`, `maxcount`, `stackable`, `ContainerSlots`, `StatsCount`, `stat_type1`, `stat_value1`, `stat_type2`, `stat_value2`, `stat_type3`, `stat_value3`, `stat_type4`, `stat_value4`, `stat_type5`, `stat_value5`, `stat_type6`, `stat_value6`, `stat_type7`, `stat_value7`, `stat_type8`, `stat_value8`, `stat_type9`, `stat_value9`, `stat_type10`, `stat_value10`, `ScalingStatDistribution`, `ScalingStatValue`, `dmg_min1`, `dmg_max1`, `dmg_type1`, `dmg_min2`, `dmg_max2`, `dmg_type2`, `armor`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `delay`, `ammo_type`, `RangedModRange`, `spellid_1`, `spelltrigger_1`, `spellcharges_1`, `spellppmRate_1`, `spellcooldown_1`, `spellcategory_1`, `spellcategorycooldown_1`, `spellid_2`, `spelltrigger_2`, `spellcharges_2`, `spellppmRate_2`, `spellcooldown_2`, `spellcategory_2`, `spellcategorycooldown_2`, `spellid_3`, `spelltrigger_3`, `spellcharges_3`, `spellppmRate_3`, `spellcooldown_3`, `spellcategory_3`, `spellcategorycooldown_3`, `spellid_4`, `spelltrigger_4`, `spellcharges_4`, `spellppmRate_4`, `spellcooldown_4`, `spellcategory_4`, `spellcategorycooldown_4`, `spellid_5`, `spelltrigger_5`, `spellcharges_5`, `spellppmRate_5`, `spellcooldown_5`, `spellcategory_5`, `spellcategorycooldown_5`, `bonding`, `description`, `PageText`, `LanguageID`, `PageMaterial`, `startquest`, `lockid`, `Material`, `sheath`, `RandomProperty`, `RandomSuffix`, `block`, `itemset`, `MaxDurability`, `area`, `Map`, `BagFamily`, `TotemCategory`, `socketColor_1`, `socketContent_1`, `socketColor_2`, `socketContent_2`, `socketColor_3`, `socketContent_3`, `socketBonus`, `GemProperties`, `RequiredDisenchantSkill`, `ArmorDamageModifier`, `duration`, `ItemLimitCategory`, `HolidayId`, `ScriptName`, `DisenchantID`, `FoodType`, `minMoneyLoot`, `maxMoneyLoot`, `flagsCustom`, `WDBVerified`) values('100001','15','0','-1','Summon Stone','46787','4','72','0','1','0','0','0','-1','-1','1','1','0','0','0','0','0','0','6','1','1','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','18282','0','0','0','8000','0','-1','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','1','|cff00FF00Use: Summons FLaming Legion Teleporter.|r','0','0','0','0','0','3','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','-1','0','0','0','0','summon','0','0','0','0','0','-4');
 diff --git a/src/server/game/AI/ScriptedAI/sc_npc_teleport.cpp b/src/server/game/AI/ScriptedAI/sc_npc_teleport.cpp
 new file mode 100644
-index 0000000000..adf831e4f6
+index 0000000000..4ecb74b69d
 --- /dev/null
 +++ b/src/server/game/AI/ScriptedAI/sc_npc_teleport.cpp
 @@ -0,0 +1,432 @@
@@ -351,7 +351,7 @@ index 0000000000..adf831e4f6
 +        return player->GetSession()->GetAccountId() == m_catvalue.data0;
 +
 +      case FLAG_LEVEL:
-+        return player->getLevel() >= m_catvalue.data0;
++        return player->GetLevel() >= m_catvalue.data0;
 +
 +      case FLAG_ITEM:
 +        return player->HasItemCount(m_catvalue.data0, m_catvalue.data1, true);
@@ -362,13 +362,13 @@ index 0000000000..adf831e4f6
 +        return player->GetQuestRewardStatus(m_catvalue.data0);
 +
 +      case FLAG_GENDER:
-+        return player->getGender() == m_catvalue.data0;
++        return player->GetGender() == m_catvalue.data0;
 +
 +      case FLAG_RACE:
-+        return player->getRace() == m_catvalue.data0;
++        return player->GetRace() == m_catvalue.data0;
 +
 +      case FLAG_CLASS:
-+        return player->getClass() == m_catvalue.data0;
++        return player->GetClass() == m_catvalue.data0;
 +
 +      case FLAG_REPUTATION:
 +        return player->GetReputationRank(m_catvalue.data0) >= (int32)m_catvalue.data1;
@@ -816,7 +816,7 @@ index 0000000000..ba94168528
 +
 +#endif
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..8743782565 100644
+index b6b83ac184..0b07af0750 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -64,7 +64,10 @@
@@ -845,7 +845,7 @@ index 5412cf1942..8743782565 100644
  // end52
 diff --git a/src/server/scripts/Custom/npc_teleport.cpp b/src/server/scripts/Custom/npc_teleport.cpp
 new file mode 100644
-index 0000000000..e81298476e
+index 0000000000..b664ec1100
 --- /dev/null
 +++ b/src/server/scripts/Custom/npc_teleport.cpp
 @@ -0,0 +1,273 @@
@@ -988,7 +988,7 @@ index 0000000000..e81298476e
 +    {
 +        Dest dest (TabCatDest[Cat[player]].GetDest(id));
 +
-+        if (player->getLevel() < dest.m_level && !player->IsGameMaster())
++        if (player->GetLevel() < dest.m_level && !player->IsGameMaster())
 +        {
 +            LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
 +            char const* text = sObjectMgr->GetTrinityString(8000, loc_idx);
@@ -1175,5 +1175,5 @@ index 0000000000..f56959de91
 +        new summon();
 +}
 -- 
-2.11.0
+2.20.1
 
