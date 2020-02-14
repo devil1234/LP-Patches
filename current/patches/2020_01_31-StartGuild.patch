@@ -1,17 +1,17 @@
-From 8a89c2c025822bd9039164ec9aa0ca0e565742cd Mon Sep 17 00:00:00 2001
+From fcddd1c017120f3c3e636d6e9c533432b9cc2a8b Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Tue, 2 Oct 2018 20:40:33 -0500
-Subject: [PATCH] 2018_09_27-StartGuild
+Date: Fri, 14 Feb 2020 04:16:34 -0600
+Subject: [PATCH] 2020_01_31-StartGuild
 
 ---
- src/server/scripts/Custom/custom_script_loader.cpp |  6 ++--
- src/server/scripts/Custom/gon_playerscripts.cpp    | 32 ++++++++++++++++++++++
- src/server/worldserver/worldserver.conf.dist       | 25 +++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |  6 ++--
+ .../scripts/Custom/gon_playerscripts.cpp      | 32 +++++++++++++++++++
+ src/server/worldserver/worldserver.conf.dist  | 25 +++++++++++++++
  3 files changed, 61 insertions(+), 2 deletions(-)
  create mode 100644 src/server/scripts/Custom/gon_playerscripts.cpp
 
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..4a81c83e7c 100644
+index b6b83ac184..58a3a0e71e 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -92,7 +92,8 @@
@@ -74,10 +74,10 @@ index 0000000000..0498917b03
 +}
 \ No newline at end of file
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index 6ee9e3158c..7b6595aca8 100644
+index afa4fcccce..8f32511149 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -4016,6 +4016,31 @@ Metric.OverallStatusInterval = 1
+@@ -4096,6 +4096,31 @@ Metric.OverallStatusInterval = 1
  #
  ###################################################################################################
  
@@ -110,5 +110,5 @@ index 6ee9e3158c..7b6595aca8 100644
  # Prepatch by LordPsyan.
  # See http://www.realmsofwarcraft.com/bb for forums and information.
 -- 
-2.11.0
+2.20.1
 
