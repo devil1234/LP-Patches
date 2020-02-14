@@ -1,12 +1,12 @@
-From e25f4e754e4bb9d32fa955997907e6f7b08f15df Mon Sep 17 00:00:00 2001
+From 321f41851166c4a52c28010f838a45fb8e27ca27 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Wed, 3 Oct 2018 04:29:11 -0500
-Subject: [PATCH] 2018_09_27-VIPCommands
+Date: Fri, 14 Feb 2020 08:42:57 -0600
+Subject: [PATCH] 2020_01_31-VIPCommands
 
 ---
- VIP_Commands.md                                    |  15 +++
- src/server/scripts/Custom/VIPCommands.cpp          | 147 +++++++++++++++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |   6 +-
+ VIP_Commands.md                               |  15 ++
+ src/server/scripts/Custom/VIPCommands.cpp     | 147 ++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |   6 +-
  3 files changed, 166 insertions(+), 2 deletions(-)
  create mode 100644 VIP_Commands.md
  create mode 100644 src/server/scripts/Custom/VIPCommands.cpp
@@ -186,7 +186,7 @@ index 0000000000..1eeefceda5
 +    new vipcommands();
 +}
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..77a690d95f 100644
+index b6b83ac184..7e4d16d5cb 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -175,7 +175,8 @@
@@ -210,5 +210,5 @@ index 5412cf1942..77a690d95f 100644
  // end162
  // end163
 -- 
-2.11.0
+2.20.1
 
