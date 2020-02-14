@@ -1,13 +1,13 @@
-From 09ee3ef6b3ac639fa34583b15be3b7603a7f909f Mon Sep 17 00:00:00 2001
+From 537d6f44b48521c1af75ef2122489bfc4d0f41f9 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Wed, 3 Oct 2018 05:16:33 -0500
-Subject: [PATCH] 2018_09_27-VoteRewards
+Date: Fri, 14 Feb 2020 16:03:45 -0600
+Subject: [PATCH] 2020_01_31-VoteRewards
 
 ---
- sql/LordPsyan-Patches/auth/auth.vote-npc.sql       |   6 +
- sql/LordPsyan-Patches/world/world.vote-npc.sql     |   3 +
- src/server/scripts/Custom/custom_script_loader.cpp |   6 +-
- src/server/scripts/Custom/npc_vote_rewarder.cpp    | 449 +++++++++++++++++++++
+ sql/LordPsyan-Patches/auth/auth.vote-npc.sql  |   6 +
+ .../world/world.vote-npc.sql                  |   3 +
+ .../scripts/Custom/custom_script_loader.cpp   |   6 +-
+ .../scripts/Custom/npc_vote_rewarder.cpp      | 449 ++++++++++++++++++
  4 files changed, 462 insertions(+), 2 deletions(-)
  create mode 100644 sql/LordPsyan-Patches/auth/auth.vote-npc.sql
  create mode 100644 sql/LordPsyan-Patches/world/world.vote-npc.sql
@@ -36,7 +36,7 @@ index 0000000000..2bc6842da5
 +('60005','0','0','0','0','0','18','0','18','0','George','Vote Rewards','','0','59','61','0','35','1','1.48','1.14286','0','0','0','1500','1900','1','1','1','0','0','0','0','0','0','0','0','7','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','','1','1','1','1','1','1','1','0','0','1','0','0','npc_vote_rewarder','1');
 \ No newline at end of file
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..a743b9c825 100644
+index b6b83ac184..1a1d4f244a 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -83,7 +83,8 @@
@@ -515,5 +515,5 @@ index 0000000000..2c8456bf6d
 +    new npc_vote_rewarder();
 +}
 -- 
-2.11.0
+2.20.1
 
