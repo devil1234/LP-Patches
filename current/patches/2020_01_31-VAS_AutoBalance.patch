@@ -1,20 +1,20 @@
-From 5ee9d4e58e69aff180854263171d76fb831a1bbe Mon Sep 17 00:00:00 2001
+From b20597b9165fb3c6c8106aa62ccad195439df71b Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Wed, 3 Oct 2018 04:26:53 -0500
-Subject: [PATCH] 2018_09_27-VAS_AutoBalance
+Date: Fri, 14 Feb 2020 07:41:05 -0600
+Subject: [PATCH] 2020_01_31-VAS_AutoBalance
 
 ---
- VASAutoBalance.conf.dist                           | 200 ++++++++
- src/server/game/Entities/Creature/Creature.cpp     |   2 +
- src/server/game/Entities/Unit/Unit.cpp             |   6 +
- src/server/game/Scripting/ScriptMgr.cpp            |  65 +++
- src/server/game/Scripting/ScriptMgr.h              |  60 +++
- src/server/game/World/World.cpp                    |  19 +
- src/server/game/World/World.h                      |  22 +
- src/server/scripts/Custom/VAS_AutoBalance.cpp      | 515 +++++++++++++++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |   6 +-
- src/server/worldserver/worldserver.conf.dist       |  72 +++
- 10 files changed, 965 insertions(+), 2 deletions(-)
+ VASAutoBalance.conf.dist                      | 200 +++++++
+ .../game/Entities/Creature/Creature.cpp       |   2 +
+ src/server/game/Entities/Unit/Unit.cpp        |   6 +
+ src/server/game/Scripting/ScriptMgr.cpp       |  65 +++
+ src/server/game/Scripting/ScriptMgr.h         |  61 ++-
+ src/server/game/World/World.cpp               |  19 +
+ src/server/game/World/World.h                 |  22 +
+ src/server/scripts/Custom/VAS_AutoBalance.cpp | 515 ++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |   6 +-
+ src/server/worldserver/worldserver.conf.dist  |  72 +++
+ 10 files changed, 965 insertions(+), 3 deletions(-)
  create mode 100644 VASAutoBalance.conf.dist
  create mode 100644 src/server/scripts/Custom/VAS_AutoBalance.cpp
 
@@ -225,10 +225,10 @@ index 0000000000..7e94af5f7d
 +VASAutoBalance.reward.MinPlayerReward = 1
 +#
 diff --git a/src/server/game/Entities/Creature/Creature.cpp b/src/server/game/Entities/Creature/Creature.cpp
-index 7cbb2e3d2b..e735fbb052 100644
+index 9b90fe95b3..09bf313389 100644
 --- a/src/server/game/Entities/Creature/Creature.cpp
 +++ b/src/server/game/Entities/Creature/Creature.cpp
-@@ -1447,6 +1447,8 @@ void Creature::UpdateLevelDependantStats()
+@@ -1444,6 +1444,8 @@ void Creature::UpdateLevelDependantStats()
  
      float armor = (float)stats->GenerateArmor(cInfo); /// @todo Why is this treated as uint32 when it's a float?
      SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
@@ -238,18 +238,18 @@ index 7cbb2e3d2b..e735fbb052 100644
  
  float Creature::_GetHealthMod(int32 Rank)
 diff --git a/src/server/game/Entities/Unit/Unit.cpp b/src/server/game/Entities/Unit/Unit.cpp
-index 45a9d4b35d..9d6d9c672c 100644
+index 7640d6ece0..669643a3e3 100644
 --- a/src/server/game/Entities/Unit/Unit.cpp
 +++ b/src/server/game/Entities/Unit/Unit.cpp
-@@ -1415,6 +1415,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
-         if (victim->getLevel() < 30)
-             chance = 0.65f * victim->getLevel() + 0.5f;
+@@ -1448,6 +1448,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
+         if (victim->GetLevel() < 30)
+             chance = 0.65f * victim->GetLevel() + 0.5f;
  
 +
          uint32 const victimDefense = victim->GetDefenseSkillValue();
          uint32 const attackerMeleeSkill = GetMaxSkillValueForLevel();
  
-@@ -2144,6 +2145,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
+@@ -2125,6 +2126,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
      if (victim->GetTypeId() == TYPEID_PLAYER && crit_chance > 0 && !victim->IsStandState())
          return MELEE_HIT_CRIT;
  
@@ -257,7 +257,7 @@ index 45a9d4b35d..9d6d9c672c 100644
      // 2. DODGE
      if (canDodge)
      {
-@@ -3164,6 +3166,7 @@ void Unit::ProcessTerrainStatusUpdate(ZLiquidStatus status, Optional<LiquidData>
+@@ -3145,6 +3147,7 @@ void Unit::ProcessTerrainStatusUpdate(ZLiquidStatus status, Optional<LiquidData>
      else
          RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
  
@@ -265,7 +265,7 @@ index 45a9d4b35d..9d6d9c672c 100644
      // liquid aura handling
      LiquidTypeEntry const* curLiquid = nullptr;
      if ((status & MAP_LIQUID_STATUS_SWIMMING) && liquidData)
-@@ -6344,7 +6347,10 @@ void Unit::SendHealSpellLog(HealInfo& healInfo, bool critical /*= false*/)
+@@ -6340,7 +6343,10 @@ void Unit::SendHealSpellLog(HealInfo& healInfo, bool critical /*= false*/)
  int32 Unit::HealBySpell(HealInfo& healInfo, bool critical /*= false*/)
  {
      // calculate heal absorb and reduce healing
@@ -277,10 +277,10 @@ index 45a9d4b35d..9d6d9c672c 100644
      SendHealSpellLog(healInfo, critical);
      return healInfo.GetEffectiveHeal();
 diff --git a/src/server/game/Scripting/ScriptMgr.cpp b/src/server/game/Scripting/ScriptMgr.cpp
-index d63eca9242..4967e86705 100644
+index 18d1f45910..a859e05f3e 100644
 --- a/src/server/game/Scripting/ScriptMgr.cpp
 +++ b/src/server/game/Scripting/ScriptMgr.cpp
-@@ -44,6 +44,7 @@
+@@ -43,6 +43,7 @@
  #include "WorldPacket.h"
  #include "WorldSession.h"
  
@@ -288,7 +288,7 @@ index d63eca9242..4967e86705 100644
  // Trait which indicates whether this script type
  // must be assigned in the database.
  template<typename>
-@@ -791,6 +792,7 @@ public:
+@@ -790,6 +791,7 @@ public:
                  }
              }
  
@@ -296,7 +296,7 @@ index d63eca9242..4967e86705 100644
              // If the script isn't assigned -> assign it!
              _scripts.insert(std::make_pair(id, std::move(script_ptr)));
              _ids_of_contexts.insert(std::make_pair(sScriptMgr->GetCurrentScriptContext(), id));
-@@ -1365,6 +1367,44 @@ void ScriptMgr::OnGroupRateCalculation(float& rate, uint32 count, bool isRaid)
+@@ -1364,6 +1366,44 @@ void ScriptMgr::OnGroupRateCalculation(float& rate, uint32 count, bool isRaid)
      FOREACH_SCRIPT(FormulaScript)->OnGroupRateCalculation(rate, count, isRaid);
  }
  
@@ -341,7 +341,7 @@ index d63eca9242..4967e86705 100644
  #define SCR_MAP_BGN(M, V, I, E, C, T) \
      if (V->GetEntry() && V->GetEntry()->T()) \
      { \
-@@ -1457,6 +1497,8 @@ void ScriptMgr::OnPlayerEnterMap(Map* map, Player* player)
+@@ -1456,6 +1496,8 @@ void ScriptMgr::OnPlayerEnterMap(Map* map, Player* player)
      ASSERT(map);
      ASSERT(player);
  
@@ -350,7 +350,7 @@ index d63eca9242..4967e86705 100644
      FOREACH_SCRIPT(PlayerScript)->OnMapChanged(player);
  
      SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
-@@ -1477,6 +1519,8 @@ void ScriptMgr::OnPlayerLeaveMap(Map* map, Player* player)
+@@ -1476,6 +1518,8 @@ void ScriptMgr::OnPlayerLeaveMap(Map* map, Player* player)
      ASSERT(map);
      ASSERT(player);
  
@@ -359,7 +359,7 @@ index d63eca9242..4967e86705 100644
      SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
          itr->second->OnPlayerLeave(map, player);
      SCR_MAP_END;
-@@ -1566,7 +1610,18 @@ bool ScriptMgr::OnCastItemCombatSpell(Player* player, Unit* victim, SpellInfo co
+@@ -1565,7 +1609,18 @@ bool ScriptMgr::OnCastItemCombatSpell(Player* player, Unit* victim, SpellInfo co
      GET_SCRIPT_RET(ItemScript, item->GetScriptId(), tmpscript, true);
      return tmpscript->OnCastItemCombatSpell(player, victim, spellInfo, item);
  }
@@ -378,7 +378,7 @@ index d63eca9242..4967e86705 100644
  CreatureAI* ScriptMgr::GetCreatureAI(Creature* creature)
  {
      ASSERT(creature);
-@@ -1805,6 +1860,14 @@ bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target)
+@@ -1804,6 +1859,14 @@ bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target)
      return tmpscript->OnCheck(source, target);
  }
  
@@ -393,7 +393,7 @@ index d63eca9242..4967e86705 100644
  // Player
  void ScriptMgr::OnPVPKill(Player* killer, Player* killed)
  {
-@@ -2306,10 +2369,12 @@ template class TC_GAME_API ScriptRegistry<SpellScriptLoader>;
+@@ -2310,10 +2373,12 @@ template class TC_GAME_API ScriptRegistry<SpellScriptLoader>;
  template class TC_GAME_API ScriptRegistry<ServerScript>;
  template class TC_GAME_API ScriptRegistry<WorldScript>;
  template class TC_GAME_API ScriptRegistry<FormulaScript>;
@@ -407,10 +407,10 @@ index d63eca9242..4967e86705 100644
  template class TC_GAME_API ScriptRegistry<GameObjectScript>;
  template class TC_GAME_API ScriptRegistry<AreaTriggerScript>;
 diff --git a/src/server/game/Scripting/ScriptMgr.h b/src/server/game/Scripting/ScriptMgr.h
-index 39a51c3be6..2e25a685fc 100644
+index d540c821ce..9935279137 100644
 --- a/src/server/game/Scripting/ScriptMgr.h
 +++ b/src/server/game/Scripting/ScriptMgr.h
-@@ -21,6 +21,7 @@
+@@ -20,6 +20,7 @@
  
  #include "Common.h"
  #include "ObjectGuid.h"
@@ -418,7 +418,7 @@ index 39a51c3be6..2e25a685fc 100644
  #include <vector>
  
  class AccountMgr;
-@@ -64,6 +65,7 @@ class WorldSession;
+@@ -63,6 +64,7 @@ class WorldSession;
  struct AchievementCriteriaData;
  struct AreaTriggerEntry;
  struct AuctionEntry;
@@ -458,10 +458,10 @@ index 39a51c3be6..2e25a685fc 100644
  template<class TMap> class MapScript : public UpdatableScript<TMap>
  {
      MapEntry const* _mapEntry;
-@@ -407,6 +427,13 @@ class TC_GAME_API UnitScript : public ScriptObject
+@@ -410,6 +430,13 @@ class TC_GAME_API UnitScript : public ScriptObject
  
-         // Called when Spell Damage is being Dealt
-         virtual void ModifySpellDamageTaken(Unit* /*target*/, Unit* /*attacker*/, int32& /*damage*/) { }
+         // Called when an unit exits a vehicle
+         virtual void ModifyVehiclePassengerExitPos(Unit* /*passenger*/, Vehicle* /*vehicle*/, Position& /*pos*/) { }
 +
 +        // Called when Heal is Recieved
 +        virtual void ModifyHealRecieved(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/) { }
@@ -471,8 +471,8 @@ index 39a51c3be6..2e25a685fc 100644
 +
  };
  
- class TC_GAME_API CreatureScript : public UnitScript
-@@ -421,6 +448,21 @@ class TC_GAME_API CreatureScript : public UnitScript
+ class TC_GAME_API CreatureScript : public ScriptObject
+@@ -426,6 +453,21 @@ class TC_GAME_API CreatureScript : public ScriptObject
          virtual CreatureAI* GetAI(Creature* /*creature*/) const = 0;
  };
  
@@ -494,7 +494,7 @@ index 39a51c3be6..2e25a685fc 100644
  class TC_GAME_API GameObjectScript : public ScriptObject
  {
      protected:
-@@ -857,6 +899,10 @@ class TC_GAME_API ScriptMgr
+@@ -865,6 +907,10 @@ class TC_GAME_API ScriptMgr
  
          void Unload();
  
@@ -505,7 +505,7 @@ index 39a51c3be6..2e25a685fc 100644
      public: /* SpellScriptLoader */
  
          void CreateSpellScripts(uint32 spellId, std::vector<SpellScript*>& scriptVector, Spell* invoker) const;
-@@ -882,6 +928,7 @@ class TC_GAME_API ScriptMgr
+@@ -890,6 +936,7 @@ class TC_GAME_API ScriptMgr
          void OnWorldUpdate(uint32 diff);
          void OnStartup();
          void OnShutdown();
@@ -513,7 +513,7 @@ index 39a51c3be6..2e25a685fc 100644
  
      public: /* FormulaScript */
  
-@@ -893,6 +940,11 @@ class TC_GAME_API ScriptMgr
+@@ -901,6 +948,11 @@ class TC_GAME_API ScriptMgr
          void OnGainCalculation(uint32& gain, Player* player, Unit* unit);
          void OnGroupRateCalculation(float& rate, uint32 count, bool isRaid);
  
@@ -525,7 +525,7 @@ index 39a51c3be6..2e25a685fc 100644
      public: /* MapScript */
  
          void OnCreateMap(Map* map);
-@@ -915,6 +967,12 @@ class TC_GAME_API ScriptMgr
+@@ -923,6 +975,12 @@ class TC_GAME_API ScriptMgr
          bool OnItemRemove(Player* player, Item* item);
          bool OnCastItemCombatSpell(Player* player, Unit* victim, SpellInfo const* spellInfo, Item* item);
  
@@ -538,20 +538,21 @@ index 39a51c3be6..2e25a685fc 100644
      public: /* CreatureScript */
  
          CreatureAI* GetCreatureAI(Creature* creature);
-@@ -1053,6 +1111,8 @@ class TC_GAME_API ScriptMgr
-         void ModifyPeriodicDamageAurasTick(Unit* target, Unit* attacker, uint32& damage);
+@@ -1063,7 +1121,8 @@ class TC_GAME_API ScriptMgr
          void ModifyMeleeDamage(Unit* target, Unit* attacker, uint32& damage);
          void ModifySpellDamageTaken(Unit* target, Unit* attacker, int32& damage);
+         void ModifyVehiclePassengerExitPos(Unit* passenger, Vehicle* vehicle, Position& pos);
+-
 +        void ModifyHealRecieved(Unit* target, Unit* attacker, uint32& addHealth);
 +        uint32 DealDamage(Unit* AttackerUnit, Unit *pVictim,uint32 damage,DamageEffectType damagetype);
- 
      private:
          uint32 _scriptCount;
+ 
 diff --git a/src/server/game/World/World.cpp b/src/server/game/World/World.cpp
-index 82dbe507d3..dd8884e8d3 100644
+index 86c38d6aa4..1dc9c7b1ff 100644
 --- a/src/server/game/World/World.cpp
 +++ b/src/server/game/World/World.cpp
-@@ -1471,6 +1471,22 @@ void World::LoadConfigSettings(bool reload)
+@@ -1510,6 +1510,22 @@ void World::LoadConfigSettings(bool reload)
      m_bool_configs[CONFIG_PDUMP_NO_OVERWRITE] = sConfigMgr->GetBoolDefault("PlayerDump.DisallowOverwrite", true);
      m_bool_configs[CONFIG_UI_QUESTLEVELS_IN_DIALOGS] = sConfigMgr->GetBoolDefault("UI.ShowQuestLevelsInDialogs", false);
  
@@ -574,7 +575,7 @@ index 82dbe507d3..dd8884e8d3 100644
      // Wintergrasp battlefield
      m_bool_configs[CONFIG_WINTERGRASP_ENABLE] = sConfigMgr->GetBoolDefault("Wintergrasp.Enable", false);
      m_int_configs[CONFIG_WINTERGRASP_PLR_MAX] = sConfigMgr->GetIntDefault("Wintergrasp.PlayerMax", 100);
-@@ -2142,6 +2158,9 @@ void World::SetInitialWorldSettings()
+@@ -2195,6 +2211,9 @@ void World::SetInitialWorldSettings()
      // Delete all characters which have been deleted X days before
      Player::DeleteOldCharacters();
  
@@ -585,10 +586,10 @@ index 82dbe507d3..dd8884e8d3 100644
      sAuctionBot->Initialize();
  
 diff --git a/src/server/game/World/World.h b/src/server/game/World/World.h
-index c0cb58fc77..108aeb770c 100644
+index 975cd0d06f..e74fa730a0 100644
 --- a/src/server/game/World/World.h
 +++ b/src/server/game/World/World.h
-@@ -238,6 +238,9 @@ enum WorldFloatConfigs
+@@ -236,6 +236,9 @@ enum WorldFloatConfigs
      CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS,
      CONFIG_THREAT_RADIUS,
      CONFIG_CHANCE_OF_GM_SURVEY,
@@ -598,7 +599,7 @@ index c0cb58fc77..108aeb770c 100644
      CONFIG_STATS_LIMITS_DODGE,
      CONFIG_STATS_LIMITS_PARRY,
      CONFIG_STATS_LIMITS_BLOCK,
-@@ -441,6 +444,9 @@ enum WorldIntConfigs
+@@ -444,6 +447,9 @@ enum WorldIntConfigs
      CONFIG_WARDEN_CLIENT_BAN_DURATION,
      CONFIG_WARDEN_NUM_MEM_CHECKS,
      CONFIG_WARDEN_NUM_OTHER_CHECKS,
@@ -608,7 +609,7 @@ index c0cb58fc77..108aeb770c 100644
      CONFIG_WINTERGRASP_PLR_MAX,
      CONFIG_WINTERGRASP_PLR_MIN,
      CONFIG_WINTERGRASP_PLR_MIN_LVL,
-@@ -768,6 +774,14 @@ class TC_GAME_API World
+@@ -774,6 +780,14 @@ class TC_GAME_API World
          /// Get the path where data (dbc, maps) are stored on disk
          std::string const& GetDataPath() const { return m_dataPath; }
  
@@ -623,7 +624,7 @@ index c0cb58fc77..108aeb770c 100644
          /// Next daily quests and random bg reset time
          time_t GetNextDailyQuestsResetTime() const { return m_NextDailyQuestReset; }
          time_t GetNextWeeklyQuestsResetTime() const { return m_NextWeeklyQuestReset; }
-@@ -928,6 +942,14 @@ class TC_GAME_API World
+@@ -936,6 +950,14 @@ class TC_GAME_API World
          uint32 m_ShutdownTimer;
          uint32 m_ShutdownMask;
  
@@ -640,7 +641,7 @@ index c0cb58fc77..108aeb770c 100644
          bool m_isClosed;
 diff --git a/src/server/scripts/Custom/VAS_AutoBalance.cpp b/src/server/scripts/Custom/VAS_AutoBalance.cpp
 new file mode 100644
-index 0000000000..eb5c6cb359
+index 0000000000..e2b5bfafdf
 --- /dev/null
 +++ b/src/server/scripts/Custom/VAS_AutoBalance.cpp
 @@ -0,0 +1,515 @@
@@ -1032,7 +1033,7 @@ index 0000000000..eb5c6cb359
 +        }
 +
 +        CreatureTemplate const *creatureTemplate = creature->GetCreatureTemplate();
-+        CreatureBaseStats const* creatureStats = sObjectMgr->GetCreatureBaseStats(creature->getLevel(), creatureTemplate->unit_class);
++        CreatureBaseStats const* creatureStats = sObjectMgr->GetCreatureBaseStats(creature->GetLevel(), creatureTemplate->unit_class);
 +
 +        float damageMultiplier = 1.0f;
 +        float healthMultiplier = 1.0f;
@@ -1160,7 +1161,7 @@ index 0000000000..eb5c6cb359
 +    new VAS_AutoBalance_WorldMapScript;
 +}
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..d7df80d68f 100644
+index b6b83ac184..5e01e3e56a 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -100,7 +100,8 @@
@@ -1184,10 +1185,10 @@ index 5412cf1942..d7df80d68f 100644
  // end87
  // end88
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index 6ee9e3158c..c864516d74 100644
+index afa4fcccce..09f3b90f14 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -58,6 +58,7 @@ PrepatchGI.Added = 0
+@@ -59,6 +59,7 @@ PrepatchGI.Added = 0
  #    LOGGING SYSTEM SETTINGS
  #    PACKET SPOOF PROTECTION SETTINGS
  #    METRIC SETTINGS
@@ -1195,7 +1196,7 @@ index 6ee9e3158c..c864516d74 100644
  #
  ###################################################################################################
  
-@@ -4016,6 +4017,77 @@ Metric.OverallStatusInterval = 1
+@@ -4096,6 +4097,77 @@ Metric.OverallStatusInterval = 1
  #
  ###################################################################################################
  
@@ -1274,5 +1275,5 @@ index 6ee9e3158c..c864516d74 100644
  # Prepatch by LordPsyan.
  # See http://www.realmsofwarcraft.com/bb for forums and information.
 -- 
-2.11.0
+2.20.1
 
