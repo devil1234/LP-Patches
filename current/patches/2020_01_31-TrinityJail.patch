@@ -1,26 +1,26 @@
-From df77e89120a2085e93e4479df93ffa664bbb1c6f Mon Sep 17 00:00:00 2001
+From 92c2b34b17b880f28f880af6639ea50ae241d1d1 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Wed, 3 Oct 2018 04:06:41 -0500
-Subject: [PATCH] 2018_09_27-TrinityJail
+Date: Fri, 14 Feb 2020 06:04:36 -0600
+Subject: [PATCH] 2020_01_31-TrinityJail
 
 ---
- sql/LordPsyan-Patches/auth/auth.jail.sql           |  13 +
- .../characters/characters_jail.sql                 |  66 ++++
- .../world/world_command_Deutsch.sql                |   7 +
- .../world/world_command_English.sql                |   7 +
- .../world/world_command_Francais.sql               |   7 +
- .../world/world_trinity_string.sql                 |  39 +++
- .../Database/Implementation/CharacterDatabase.cpp  |   1 +
- .../Database/Implementation/CharacterDatabase.h    |   1 +
- src/server/game/Accounts/RBAC.h                    |   5 +-
- src/server/game/Entities/Player/Player.cpp         | 186 +++++++++-
- src/server/game/Entities/Player/Player.h           |  19 +
- src/server/game/Globals/ObjectMgr.cpp              | 115 ++++++
- src/server/game/Globals/ObjectMgr.h                |  23 ++
- src/server/game/Miscellaneous/Language.h           |  36 +-
- src/server/game/World/World.cpp                    |   4 +
- src/server/scripts/Commands/cs_jail.cpp            | 388 +++++++++++++++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |   6 +-
+ sql/LordPsyan-Patches/auth/auth.jail.sql      |  13 +
+ .../characters/characters_jail.sql            |  66 +++
+ .../world/world_command_Deutsch.sql           |   7 +
+ .../world/world_command_English.sql           |   7 +
+ .../world/world_command_Francais.sql          |   7 +
+ .../world/world_trinity_string.sql            |  39 ++
+ .../Implementation/CharacterDatabase.cpp      |   1 +
+ .../Implementation/CharacterDatabase.h        |   1 +
+ src/server/game/Accounts/RBAC.h               |   5 +-
+ src/server/game/Entities/Player/Player.cpp    | 186 ++++++++-
+ src/server/game/Entities/Player/Player.h      |  19 +
+ src/server/game/Globals/ObjectMgr.cpp         | 115 ++++++
+ src/server/game/Globals/ObjectMgr.h           |  23 ++
+ src/server/game/Miscellaneous/Language.h      |  36 +-
+ src/server/game/World/World.cpp               |   4 +
+ src/server/scripts/Commands/cs_jail.cpp       | 388 ++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |   6 +-
  17 files changed, 917 insertions(+), 6 deletions(-)
  create mode 100644 sql/LordPsyan-Patches/auth/auth.jail.sql
  create mode 100644 sql/LordPsyan-Patches/characters/characters_jail.sql
@@ -207,10 +207,10 @@ index 0000000000..5875afca8a
 +('982', 'Robotron', null, 'Robotron', 'Robotron', null, null, null, null, null),
 +('983', 'Your Jail status was reset to 0 ', null, 'Votre statut a été Jail à 0 ', 'Dein Jail status wurde auf 0 zurück gesatzt', null, null, null, null, null);
 diff --git a/src/server/database/Database/Implementation/CharacterDatabase.cpp b/src/server/database/Database/Implementation/CharacterDatabase.cpp
-index 4582d88822..cea265f2fe 100644
+index d3533fc143..a8d3f530c1 100644
 --- a/src/server/database/Database/Implementation/CharacterDatabase.cpp
 +++ b/src/server/database/Database/Implementation/CharacterDatabase.cpp
-@@ -405,6 +405,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
+@@ -399,6 +399,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
      PrepareStatement(CHAR_INS_CHAR_INSTANCE, "INSERT INTO character_instance (guid, instance, permanent, extendState) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
      PrepareStatement(CHAR_UPD_GENDER_AND_APPEARANCE, "UPDATE characters SET gender = ?, skin = ?, face = ?, hairStyle = ?, hairColor = ?, facialStyle = ? WHERE guid = ?", CONNECTION_ASYNC);
      PrepareStatement(CHAR_DEL_CHARACTER_SKILL, "DELETE FROM character_skills WHERE guid = ? AND skill = ?", CONNECTION_ASYNC);
@@ -219,10 +219,10 @@ index 4582d88822..cea265f2fe 100644
      PrepareStatement(CHAR_INS_CHARACTER_SOCIAL, "INSERT INTO character_social (guid, friend, flags) VALUES (?, ?, ?)", CONNECTION_ASYNC);
      PrepareStatement(CHAR_DEL_CHARACTER_SOCIAL, "DELETE FROM character_social WHERE guid = ? AND friend = ?", CONNECTION_ASYNC);
 diff --git a/src/server/database/Database/Implementation/CharacterDatabase.h b/src/server/database/Database/Implementation/CharacterDatabase.h
-index 359f945d1b..22b6a26703 100644
+index 64e078acd8..a85690e49a 100644
 --- a/src/server/database/Database/Implementation/CharacterDatabase.h
 +++ b/src/server/database/Database/Implementation/CharacterDatabase.h
-@@ -330,6 +330,7 @@ enum CharacterDatabaseStatements : uint32
+@@ -324,6 +324,7 @@ enum CharacterDatabaseStatements : uint32
      CHAR_INS_CHAR_INSTANCE,
      CHAR_UPD_GENDER_AND_APPEARANCE,
      CHAR_DEL_CHARACTER_SKILL,
@@ -231,10 +231,10 @@ index 359f945d1b..22b6a26703 100644
      CHAR_INS_CHARACTER_SOCIAL,
      CHAR_DEL_CHARACTER_SOCIAL,
 diff --git a/src/server/game/Accounts/RBAC.h b/src/server/game/Accounts/RBAC.h
-index f671cd0a25..a9c9191c52 100644
+index 0410f5f7a1..affe501882 100644
 --- a/src/server/game/Accounts/RBAC.h
 +++ b/src/server/game/Accounts/RBAC.h
-@@ -777,7 +777,10 @@ enum RBACPermissions
+@@ -787,7 +787,10 @@ enum RBACPermissions
      // custom permissions 1000+
      // Prepatch by LordPsyan
      // 01
@@ -247,10 +247,10 @@ index f671cd0a25..a9c9191c52 100644
      // 04
      // 05
 diff --git a/src/server/game/Entities/Player/Player.cpp b/src/server/game/Entities/Player/Player.cpp
-index 467fb9f23b..9e8005c2bd 100644
+index 30444f2f2f..f3cd674f7d 100644
 --- a/src/server/game/Entities/Player/Player.cpp
 +++ b/src/server/game/Entities/Player/Player.cpp
-@@ -187,8 +187,24 @@ static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
+@@ -190,8 +190,24 @@ static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
  
  uint32 const MAX_MONEY_AMOUNT = static_cast<uint32>(std::numeric_limits<int32>::max());
  
@@ -354,7 +354,7 @@ index 467fb9f23b..9e8005c2bd 100644
  
      time_t now = GameTime::GetGameTime();
  
-@@ -1270,9 +1358,19 @@ void Player::Update(uint32 p_time)
+@@ -1262,9 +1350,19 @@ void Player::Update(uint32 p_time)
      }
  
      if (m_deathState == JUST_DIED)
@@ -376,7 +376,7 @@ index 467fb9f23b..9e8005c2bd 100644
      {
          if (p_time >= m_nextSave)
          {
-@@ -17817,9 +17915,77 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
+@@ -17955,9 +18053,77 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
  
      _LoadEquipmentSets(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS));
  
@@ -454,7 +454,7 @@ index 467fb9f23b..9e8005c2bd 100644
  bool Player::isAllowedToLoot(Creature const* creature)
  {
      if (!creature->isDead() || !creature->IsDamageEnoughForLootingAndReward())
-@@ -19225,8 +19391,21 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
+@@ -19363,8 +19529,21 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
  /***                   SAVE SYSTEM                     ***/
  /*********************************************************/
  
@@ -476,7 +476,7 @@ index 467fb9f23b..9e8005c2bd 100644
      // delay auto save at any saves (manual, in code, or autosave)
      m_nextSave = sWorld->getIntConfig(CONFIG_INTERVAL_SAVE);
  
-@@ -24815,11 +24994,14 @@ void Player::_LoadSkills(PreparedQueryResult result)
+@@ -25029,11 +25208,14 @@ void Player::_LoadSkills(PreparedQueryResult result)
                      GetName().c_str(), GetGUID().ToString().c_str(), skill);
  
                  PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_SKILL);
@@ -492,10 +492,10 @@ index 467fb9f23b..9e8005c2bd 100644
                  continue;
              }
 diff --git a/src/server/game/Entities/Player/Player.h b/src/server/game/Entities/Player/Player.h
-index f233596c7e..e3e89f56d1 100644
+index aebd7bf358..e030523135 100644
 --- a/src/server/game/Entities/Player/Player.h
 +++ b/src/server/game/Entities/Player/Player.h
-@@ -1933,6 +1933,25 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
+@@ -1949,6 +1949,25 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
  
          bool IsImmuneToEnvironmentalDamage() const;
          uint32 EnvironmentalDamage(EnviromentalDamage type, uint32 damage);
@@ -522,10 +522,10 @@ index f233596c7e..e3e89f56d1 100644
          /*********************************************************/
          /***               FLOOD FILTER SYSTEM                 ***/
 diff --git a/src/server/game/Globals/ObjectMgr.cpp b/src/server/game/Globals/ObjectMgr.cpp
-index 0275100e11..b6b552b85c 100644
+index 80a56d17bf..7cde5a18ed 100644
 --- a/src/server/game/Globals/ObjectMgr.cpp
 +++ b/src/server/game/Globals/ObjectMgr.cpp
-@@ -6937,6 +6937,121 @@ uint32 ObjectMgr::GeneratePetNumber()
+@@ -7323,6 +7323,121 @@ uint32 ObjectMgr::GeneratePetNumber()
      return _hiPetNumber++;
  }
  
@@ -648,10 +648,10 @@ index 0275100e11..b6b552b85c 100644
  {
      if (_creatureSpawnId >= uint32(0xFFFFFF))
 diff --git a/src/server/game/Globals/ObjectMgr.h b/src/server/game/Globals/ObjectMgr.h
-index ee423badea..fee2519f7d 100644
+index 8611a828da..b181dfb0b3 100644
 --- a/src/server/game/Globals/ObjectMgr.h
 +++ b/src/server/game/Globals/ObjectMgr.h
-@@ -1216,6 +1216,29 @@ class TC_GAME_API ObjectMgr
+@@ -1236,6 +1236,29 @@ class TC_GAME_API ObjectMgr
  
          void InitializeQueriesData(QueryDataGroup mask);
  
@@ -682,10 +682,10 @@ index ee423badea..fee2519f7d 100644
          uint32 GetBaseXP(uint8 level);
          uint32 GetXPForLevel(uint8 level) const;
 diff --git a/src/server/game/Miscellaneous/Language.h b/src/server/game/Miscellaneous/Language.h
-index 5663ae4b65..366a36dd81 100644
+index c1c9d2e793..5effb89421 100644
 --- a/src/server/game/Miscellaneous/Language.h
 +++ b/src/server/game/Miscellaneous/Language.h
-@@ -804,7 +804,41 @@ enum TrinityStrings
+@@ -790,7 +790,41 @@ enum TrinityStrings
      // 44
      // 45
      // 46
@@ -729,10 +729,10 @@ index 5663ae4b65..366a36dd81 100644
      // 49
      // 50
 diff --git a/src/server/game/World/World.cpp b/src/server/game/World/World.cpp
-index 82dbe507d3..3e80753450 100644
+index 86c38d6aa4..05cc600108 100644
 --- a/src/server/game/World/World.cpp
 +++ b/src/server/game/World/World.cpp
-@@ -2048,6 +2048,10 @@ void World::SetInitialWorldSettings()
+@@ -2100,6 +2100,10 @@ void World::SetInitialWorldSettings()
      TC_LOG_INFO("server.loading", "Returning old mails...");
      sObjectMgr->ReturnOrDeleteOldMails(false);
  
@@ -1138,7 +1138,7 @@ index 0000000000..e843b05e01
 +    new jail_commandscript();
 +}
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..f6b217e3c4 100644
+index b6b83ac184..101af4d2ae 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -68,7 +68,8 @@
@@ -1162,5 +1162,5 @@ index 5412cf1942..f6b217e3c4 100644
  // end55
  // end56
 -- 
-2.11.0
+2.20.1
 
