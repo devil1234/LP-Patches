@@ -1,18 +1,18 @@
-From 2d47e6e02a3eb047648ad8bcfa4eac5a49c462a2 Mon Sep 17 00:00:00 2001
+From 49bcaabd2358481a12eb5eb5a70639522c93bc1b Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Tue, 2 Oct 2018 16:58:17 -0500
-Subject: [PATCH] 2018_09_27-RandomItemStats
+Date: Fri, 14 Feb 2020 03:40:46 -0600
+Subject: [PATCH] 2020_01_31-RandomItemStats
 
 ---
- .../world/world.RandomStat.english.sql             | 1448 ++++++++++++++++++++
- .../world/world.RandomStat.russian.sql             | 1448 ++++++++++++++++++++
- src/server/game/Entities/Item/Item.h               |    9 +
- src/server/game/Entities/Player/Player.cpp         |   44 +
- src/server/game/Globals/ObjectMgr.cpp              |   33 +
- src/server/game/Globals/ObjectMgr.h                |    7 +
- src/server/game/World/World.cpp                    |   12 +
- src/server/game/World/World.h                      |    4 +
- src/server/worldserver/worldserver.conf.dist       |   31 +
+ .../world/world.RandomStat.english.sql        | 1448 +++++++++++++++++
+ .../world/world.RandomStat.russian.sql        | 1448 +++++++++++++++++
+ src/server/game/Entities/Item/Item.h          |    9 +
+ src/server/game/Entities/Player/Player.cpp    |   44 +
+ src/server/game/Globals/ObjectMgr.cpp         |   33 +
+ src/server/game/Globals/ObjectMgr.h           |    7 +
+ src/server/game/World/World.cpp               |   12 +
+ src/server/game/World/World.h                 |    4 +
+ src/server/worldserver/worldserver.conf.dist  |   31 +
  9 files changed, 3036 insertions(+)
  create mode 100644 sql/LordPsyan-Patches/world/world.RandomStat.english.sql
  create mode 100644 sql/LordPsyan-Patches/world/world.RandomStat.russian.sql
@@ -2928,10 +2928,10 @@ index 0000000000..2a8463a089
 +INSERT INTO `random_item_stats` VALUES(2163, 3, 4, 'Сила', 11, 3, 'Ловкость', 11, 7, 'Выносливость', 12, 22);
 \ No newline at end of file
 diff --git a/src/server/game/Entities/Item/Item.h b/src/server/game/Entities/Item/Item.h
-index ccdd04d40e..6dd03ace34 100644
+index 5129c56004..ef1b6eebc2 100644
 --- a/src/server/game/Entities/Item/Item.h
 +++ b/src/server/game/Entities/Item/Item.h
-@@ -38,6 +38,15 @@ struct ItemSetEffect
+@@ -37,6 +37,15 @@ struct ItemSetEffect
      SpellInfo const* spells[8];
  };
  
@@ -2948,11 +2948,11 @@ index ccdd04d40e..6dd03ace34 100644
  
  enum EnchantmentOffset
 diff --git a/src/server/game/Entities/Player/Player.cpp b/src/server/game/Entities/Player/Player.cpp
-index 467fb9f23b..20a5efd271 100644
+index 30444f2f2f..2767bfecc9 100644
 --- a/src/server/game/Entities/Player/Player.cpp
 +++ b/src/server/game/Entities/Player/Player.cpp
-@@ -11930,6 +11930,50 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
-         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, 1);
+@@ -11968,6 +11968,50 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
+         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, count);
          if (randomPropertyId)
              pItem->SetItemRandomProperties(randomPropertyId);
 +        else
@@ -3003,10 +3003,10 @@ index 467fb9f23b..20a5efd271 100644
  
          if (allowedLooters.size() > 1 && pItem->GetTemplate()->GetMaxStackSize() == 1 && pItem->IsSoulBound())
 diff --git a/src/server/game/Globals/ObjectMgr.cpp b/src/server/game/Globals/ObjectMgr.cpp
-index 0275100e11..7f108e5170 100644
+index 80a56d17bf..e49e5bc5aa 100644
 --- a/src/server/game/Globals/ObjectMgr.cpp
 +++ b/src/server/game/Globals/ObjectMgr.cpp
-@@ -357,6 +357,39 @@ void ObjectMgr::LoadPointOfInterestLocales()
+@@ -354,6 +354,39 @@ void ObjectMgr::LoadPointOfInterestLocales()
      TC_LOG_INFO("server.loading", ">> Loaded %u points_of_interest locale strings in %u ms", uint32(_pointOfInterestLocaleStore.size()), GetMSTimeDiffToNow(oldMSTime));
  }
  
@@ -3047,18 +3047,18 @@ index 0275100e11..7f108e5170 100644
  {
      uint32 oldMSTime = getMSTime();
 diff --git a/src/server/game/Globals/ObjectMgr.h b/src/server/game/Globals/ObjectMgr.h
-index ee423badea..c8dfa21c97 100644
+index 8611a828da..c66ffda8d4 100644
 --- a/src/server/game/Globals/ObjectMgr.h
 +++ b/src/server/game/Globals/ObjectMgr.h
-@@ -36,6 +36,7 @@
- #include "VehicleDefines.h"
+@@ -37,6 +37,7 @@
+ #include <iterator>
  #include <map>
  #include <unordered_map>
 +#include "Item.h"
  
  class Item;
  class Unit;
-@@ -538,6 +539,7 @@ struct QuestGreetingLocale
+@@ -536,6 +537,7 @@ struct QuestGreetingLocale
  
  typedef std::map<ObjectGuid, ObjectGuid> LinkedRespawnContainer;
  typedef std::unordered_map<uint32, CreatureTemplate> CreatureTemplateContainer;
@@ -3066,7 +3066,7 @@ index ee423badea..c8dfa21c97 100644
  typedef std::unordered_map<uint32, CreatureAddon> CreatureTemplateAddonContainer;
  typedef std::unordered_map<ObjectGuid::LowType, CreatureData> CreatureDataContainer;
  typedef std::unordered_map<ObjectGuid::LowType, CreatureAddon> CreatureAddonContainer;
-@@ -936,6 +938,7 @@ class TC_GAME_API ObjectMgr
+@@ -982,6 +984,7 @@ class TC_GAME_API ObjectMgr
          CreatureTemplate const* GetCreatureTemplate(uint32 entry) const;
          CreatureTemplateContainer const& GetCreatureTemplates() const { return _creatureTemplateStore; }
          CreatureModelInfo const* GetCreatureModelInfo(uint32 modelId) const;
@@ -3074,7 +3074,7 @@ index ee423badea..c8dfa21c97 100644
          CreatureModelInfo const* GetCreatureModelRandomGender(uint32* displayID) const;
          static uint32 ChooseDisplayId(CreatureTemplate const* cinfo, CreatureData const* data = nullptr);
          static void ChooseCreatureFlags(CreatureTemplate const* cinfo, uint32& npcflag, uint32& unit_flags, uint32& dynamicflags, CreatureData const* data = nullptr);
-@@ -1128,6 +1131,9 @@ class TC_GAME_API ObjectMgr
+@@ -1143,6 +1146,9 @@ class TC_GAME_API ObjectMgr
  
          bool LoadTrinityStrings();
  
@@ -3084,7 +3084,7 @@ index ee423badea..c8dfa21c97 100644
          void LoadEventScripts();
          void LoadSpellScripts();
          void LoadWaypointScripts();
-@@ -1627,6 +1633,7 @@ class TC_GAME_API ObjectMgr
+@@ -1651,6 +1657,7 @@ class TC_GAME_API ObjectMgr
  
          typedef std::unordered_map<uint32, ItemSetNameEntry> ItemSetNameContainer;
          ItemSetNameContainer _itemSetNameStore;
@@ -3093,10 +3093,10 @@ index ee423badea..c8dfa21c97 100644
          MapObjectGuids _mapObjectGuidsStore;
          CreatureDataContainer _creatureDataStore;
 diff --git a/src/server/game/World/World.cpp b/src/server/game/World/World.cpp
-index 82dbe507d3..c469c27fc0 100644
+index 86c38d6aa4..22a1b2167e 100644
 --- a/src/server/game/World/World.cpp
 +++ b/src/server/game/World/World.cpp
-@@ -1516,6 +1516,12 @@ void World::LoadConfigSettings(bool reload)
+@@ -1555,6 +1555,12 @@ void World::LoadConfigSettings(bool reload)
      // prevent character rename on character customization
      m_bool_configs[CONFIG_PREVENT_RENAME_CUSTOMIZATION] = sConfigMgr->GetBoolDefault("PreventRenameCharacterOnCustomization", false);
  
@@ -3109,7 +3109,7 @@ index 82dbe507d3..c469c27fc0 100644
      // Allow 5-man parties to use raid warnings
      m_bool_configs[CONFIG_CHAT_PARTY_RAID_WARNINGS] = sConfigMgr->GetBoolDefault("PartyRaidWarnings", false);
  
-@@ -2078,6 +2084,12 @@ void World::SetInitialWorldSettings()
+@@ -2130,6 +2136,12 @@ void World::SetInitialWorldSettings()
      TC_LOG_INFO("server.loading", "Loading Calendar data...");
      sCalendarMgr->LoadFromDB();
  
@@ -3123,10 +3123,10 @@ index 82dbe507d3..c469c27fc0 100644
      sPetitionMgr->LoadPetitions();
  
 diff --git a/src/server/game/World/World.h b/src/server/game/World/World.h
-index c0cb58fc77..65ea1ade18 100644
+index 975cd0d06f..123abdf97a 100644
 --- a/src/server/game/World/World.h
 +++ b/src/server/game/World/World.h
-@@ -220,6 +220,7 @@ enum WorldBoolConfigs
+@@ -218,6 +218,7 @@ enum WorldBoolConfigs
      CONFIG_HOTSWAP_INSTALL_ENABLED,
      CONFIG_HOTSWAP_PREFIX_CORRECTION_ENABLED,
      CONFIG_PREVENT_RENAME_CUSTOMIZATION,
@@ -3134,7 +3134,7 @@ index c0cb58fc77..65ea1ade18 100644
      CONFIG_CACHE_DATA_QUERIES,
      CONFIG_CHECK_GOBJECT_LOS,
      CONFIG_RESPAWN_DYNAMIC_ESCORTNPC,
-@@ -470,6 +471,9 @@ enum WorldIntConfigs
+@@ -473,6 +474,9 @@ enum WorldIntConfigs
      CONFIG_AUCTION_GETALL_DELAY,
      CONFIG_AUCTION_SEARCH_DELAY,
      CONFIG_TALENTS_INSPECTING,
@@ -3145,10 +3145,10 @@ index c0cb58fc77..65ea1ade18 100644
      CONFIG_RESPAWN_DYNAMICMODE,
      CONFIG_RESPAWN_GUIDWARNLEVEL,
 diff --git a/src/server/worldserver/worldserver.conf.dist b/src/server/worldserver/worldserver.conf.dist
-index 6ee9e3158c..ed0a8366a4 100644
+index afa4fcccce..e78601336f 100644
 --- a/src/server/worldserver/worldserver.conf.dist
 +++ b/src/server/worldserver/worldserver.conf.dist
-@@ -4016,6 +4016,37 @@ Metric.OverallStatusInterval = 1
+@@ -4096,6 +4096,37 @@ Metric.OverallStatusInterval = 1
  #
  ###################################################################################################
  
@@ -3187,5 +3187,5 @@ index 6ee9e3158c..ed0a8366a4 100644
  # Prepatch by LordPsyan.
  # See http://www.realmsofwarcraft.com/bb for forums and information.
 -- 
-2.11.0
+2.20.1
 
