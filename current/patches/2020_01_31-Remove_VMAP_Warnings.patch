@@ -1,17 +1,17 @@
-From 45a39aa4f053f5b0b5cde3506cffd8d9dbcf7e6e Mon Sep 17 00:00:00 2001
+From 5b3363b0ad6981fdf0f8a1a83c1575e3b3c18900 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Tue, 2 Oct 2018 20:42:53 -0500
-Subject: [PATCH] 2018_09_27-Remove_VMAP_Warnings
+Date: Fri, 14 Feb 2020 03:46:36 -0600
+Subject: [PATCH] 2020_01_31-Remove_VMAP_Warnings
 
 ---
  src/server/game/Maps/Map.cpp | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/server/game/Maps/Map.cpp b/src/server/game/Maps/Map.cpp
-index 921f982b5a..0a99398092 100644
+index 8001aa6641..d3ff8d668b 100644
 --- a/src/server/game/Maps/Map.cpp
 +++ b/src/server/game/Maps/Map.cpp
-@@ -171,7 +171,7 @@ void Map::LoadVMap(int gx, int gy)
+@@ -177,7 +177,7 @@ void Map::LoadVMap(int gx, int gy)
              TC_LOG_DEBUG("maps", "VMAP loaded name:%s, id:%d, x:%d, y:%d (vmap rep.: x:%d, y:%d)", GetMapName(), GetId(), gx, gy, gx, gy);
              break;
          case VMAP::VMAP_LOAD_RESULT_ERROR:
@@ -21,5 +21,5 @@ index 921f982b5a..0a99398092 100644
          case VMAP::VMAP_LOAD_RESULT_IGNORED:
              TC_LOG_DEBUG("maps", "Ignored VMAP name:%s, id:%d, x:%d, y:%d (vmap rep.: x:%d, y:%d)", GetMapName(), GetId(), gx, gy, gx, gy);
 -- 
-2.11.0
+2.20.1
 
