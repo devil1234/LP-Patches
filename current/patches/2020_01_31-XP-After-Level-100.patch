@@ -1,17 +1,17 @@
-From 640621238a908073cc07ced6ebc2c4b98a624158 Mon Sep 17 00:00:00 2001
+From 2c1cdd0fd18a4c83a3bb1295c104315bba26e001 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Wed, 3 Oct 2018 05:15:05 -0500
-Subject: [PATCH] 2018_09_27-XP-After-Level-100
+Date: Fri, 14 Feb 2020 18:45:27 -0600
+Subject: [PATCH] 2020_01_31-XP-After-Level-100
 
 ---
  src/server/game/World/World.cpp | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/server/game/World/World.cpp b/src/server/game/World/World.cpp
-index 82dbe507d3..9e444a0711 100644
+index 86c38d6aa4..077e53088c 100644
 --- a/src/server/game/World/World.cpp
 +++ b/src/server/game/World/World.cpp
-@@ -862,13 +862,13 @@ void World::LoadConfigSettings(bool reload)
+@@ -887,13 +887,13 @@ void World::LoadConfigSettings(bool reload)
      }
      else
          m_int_configs[CONFIG_MAX_PLAYER_LEVEL] = sConfigMgr->GetIntDefault("MaxPlayerLevel", DEFAULT_MAX_LEVEL);
@@ -28,5 +28,5 @@ index 82dbe507d3..9e444a0711 100644
  
      m_int_configs[CONFIG_START_PLAYER_LEVEL] = sConfigMgr->GetIntDefault("StartPlayerLevel", 1);
 -- 
-2.11.0
+2.20.1
 
