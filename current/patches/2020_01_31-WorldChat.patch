@@ -1,14 +1,14 @@
-From 34261a18fc3be1e59f610f4c8b8e7a0741d72866 Mon Sep 17 00:00:00 2001
+From f20bd1ef4dd15c304fb88236d66292d3a52bceb5 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Wed, 3 Oct 2018 04:57:33 -0500
-Subject: [PATCH] 2018_09_27-WorldChat
+Date: Fri, 14 Feb 2020 18:19:50 -0600
+Subject: [PATCH] 2020_01_31-WorldChat
 
 ---
- .../WorldChat/auth.worldchat.sql                   |   5 +
- src/common/Common.h                                |  15 ++-
- src/server/game/Accounts/RBAC.h                    |   2 +-
- src/server/scripts/Custom/WorldChat.cpp            | 123 +++++++++++++++++++++
- src/server/scripts/Custom/custom_script_loader.cpp |   6 +-
+ .../WorldChat/auth.worldchat.sql              |   5 +
+ src/common/Common.h                           |  15 ++-
+ src/server/game/Accounts/RBAC.h               |   2 +-
+ src/server/scripts/Custom/WorldChat.cpp       | 123 ++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |   6 +-
  5 files changed, 143 insertions(+), 8 deletions(-)
  create mode 100644 sql/TrinityCore-Patches/WorldChat/auth.worldchat.sql
  create mode 100644 src/server/scripts/Custom/WorldChat.cpp
@@ -26,10 +26,10 @@ index 0000000000..256c0222eb
 +(195, 1015);
 \ No newline at end of file
 diff --git a/src/common/Common.h b/src/common/Common.h
-index 9fdcb78587..e4a8714223 100644
+index 3f881039dd..62b98ca0ae 100644
 --- a/src/common/Common.h
 +++ b/src/common/Common.h
-@@ -74,11 +74,16 @@ enum TimeConstants
+@@ -71,11 +71,16 @@ enum TimeConstants
  
  enum AccountTypes
  {
@@ -52,10 +52,10 @@ index 9fdcb78587..e4a8714223 100644
  
  enum LocaleConstant : uint8
 diff --git a/src/server/game/Accounts/RBAC.h b/src/server/game/Accounts/RBAC.h
-index f671cd0a25..8168069d61 100644
+index 0410f5f7a1..d9de5ffdff 100644
 --- a/src/server/game/Accounts/RBAC.h
 +++ b/src/server/game/Accounts/RBAC.h
-@@ -795,7 +795,7 @@ enum RBACPermissions
+@@ -805,7 +805,7 @@ enum RBACPermissions
      // 17
      // 18
      // 19
@@ -195,7 +195,7 @@ index 0000000000..e60343420a
 +}
 \ No newline at end of file
 diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
-index 5412cf1942..b737382583 100644
+index b6b83ac184..643531d224 100644
 --- a/src/server/scripts/Custom/custom_script_loader.cpp
 +++ b/src/server/scripts/Custom/custom_script_loader.cpp
 @@ -96,7 +96,8 @@
@@ -219,5 +219,5 @@ index 5412cf1942..b737382583 100644
  // end83
  // end84
 -- 
-2.11.0
+2.20.1
 
