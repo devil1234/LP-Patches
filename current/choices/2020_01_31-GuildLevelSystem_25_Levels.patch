@@ -1,29 +1,29 @@
-From 06069bfc67dd4cd7950503d4ff4b192560536ff2 Mon Sep 17 00:00:00 2001
+From 69d54b4c4e353f4245c178d82a8c2fd0868740c9 Mon Sep 17 00:00:00 2001
 From: LordPsyan <lordpsyan@gmail.com>
-Date: Sun, 23 Feb 2020 05:15:37 -0600
-Subject: [PATCH] 2020_01_31-GuildLevelSystem_25_Levels
+Date: Wed, 11 Mar 2020 12:19:19 -0500
+Subject: [PATCH] 01_31_2020-25_level_guild_level_system
 
 ---
  .../auth/auth.guildlevelsystem.sql            |   7 +
- .../characters.guildlevelsystem.sql           |  85 ++++++++
+ .../characters.guildlevelsystem.sql           |  85 +++++++
  .../world/world.guildlevelsystem.sql          |   7 +
  .../Implementation/CharacterDatabase.cpp      |  10 +-
  .../Implementation/CharacterDatabase.h        |   7 +-
  src/server/game/Accounts/RBAC.h               |   4 +-
- src/server/game/Conditions/ConditionMgr.cpp   |  22 +++
+ src/server/game/Conditions/ConditionMgr.cpp   |  22 ++
  src/server/game/Conditions/ConditionMgr.h     |   3 +-
- src/server/game/Entities/Player/Player.cpp    |  52 ++++-
- src/server/game/Entities/Unit/Unit.cpp        |  26 ++-
- src/server/game/Guilds/Guild.cpp              | 182 ++++++++++++++++++
- src/server/game/Guilds/Guild.h                |  47 +++++
+ src/server/game/Entities/Player/Player.cpp    |  52 +++-
+ src/server/game/Entities/Unit/Unit.cpp        |  26 +-
+ src/server/game/Guilds/Guild.cpp              | 182 ++++++++++++++
+ src/server/game/Guilds/Guild.h                |  47 ++++
  src/server/game/Handlers/LootHandler.cpp      |  18 ++
  src/server/game/Miscellaneous/Formulas.h      |  18 +-
  src/server/game/Miscellaneous/Language.h      |   4 +-
  src/server/game/Reputation/ReputationMgr.cpp  |  14 ++
- src/server/game/World/World.cpp               | 139 ++++++++++++-
+ src/server/game/World/World.cpp               | 139 ++++++++++-
  src/server/game/World/World.h                 |  32 +++
- src/server/scripts/Commands/cs_guild.cpp      | 124 ++++++++++++
- 19 files changed, 789 insertions(+), 12 deletions(-)
+ src/server/scripts/Commands/cs_guild.cpp      | 223 ++++++++++++++++++
+ 19 files changed, 888 insertions(+), 12 deletions(-)
  create mode 100644 sql/LordPsyan-Patches/auth/auth.guildlevelsystem.sql
  create mode 100644 sql/LordPsyan-Patches/characters/characters.guildlevelsystem.sql
  create mode 100644 sql/LordPsyan-Patches/world/world.guildlevelsystem.sql
@@ -1040,7 +1040,7 @@ index 975cd0d06f..80ae7b43de 100644
          std::string _alertRestartReason;
  
 diff --git a/src/server/scripts/Commands/cs_guild.cpp b/src/server/scripts/Commands/cs_guild.cpp
-index ae71814a03..c080b4463d 100644
+index ae71814a03..b50477ab04 100644
 --- a/src/server/scripts/Commands/cs_guild.cpp
 +++ b/src/server/scripts/Commands/cs_guild.cpp
 @@ -49,6 +49,9 @@ public:
@@ -1053,7 +1053,7 @@ index ae71814a03..c080b4463d 100644
          };
          static std::vector<ChatCommand> commandTable =
          {
-@@ -308,6 +311,127 @@ public:
+@@ -308,6 +311,226 @@ public:
          handler->PSendSysMessage(LANG_GUILD_INFO_EXTRA_INFO, guild->GetInfo().c_str()); // Extra Information
          return true;
      }
@@ -1117,20 +1117,22 @@ index ae71814a03..c080b4463d 100644
 +            return false;
 +        }
 +    }
-+
++/*
 +    static bool HandleGuildSetLevelCommand(ChatHandler* handler, char const* args)
 +    {
 +        if (!*args)
++
++        char* tailStr = *args != '"' ? strtok(nullptr, "") : (char*)args;
++        if (!tailStr)
 +            return false;
 +
-+        char* guildNameStr;
-+        char* levelStr;
-+        handler->extractOptFirstArg((char*)args, &guildNameStr, &levelStr);
++        std::string strargs = args; // make a std::string from args
++        char* guildNameStr = handler->extractQuotedArg(tailStr); // extract guildname
++        std::string strGuildName = guildNameStr; // make a std::string from guildname
++        // remove guildname from args string
++        strargs.substr(strGuildName.length() + 2, strargs.length()); // maybe strargs.length()-1
 +
-+        if (!levelStr)
-+            return false;
-+
-+        uint8 newLevel = uint8(atoi(levelStr));
++        uint8 newLevel = uint8(atoi(strargs)); // convert what's left of args to int, this is ugly C prone to crashing like a motherfucker
 +        Guild* guild = sGuildMgr->GetGuildByName(guildNameStr);
 +
 +        if (guild)
@@ -1145,7 +1147,74 @@ index ae71814a03..c080b4463d 100644
 +        }
 +        else
 +        {
-+            handler->PSendSysMessage("There is no guild named [%s] found.", guildNameStr);
++            handler->PSendSysMessage("There is no guild named [%s] found. So we cannot make it level [%s]", guildNameStr, levelStr);
++            return false;
++        }
++
++        return true;
++    }
++*/
++    static bool HandleGuildSetLevelCommand(ChatHandler* handler, char const* args)
++    {
++        if (!*args)
++            return false;
++
++        std::string strargs = args;
++
++        std::size_t firstquote = strargs.find('"');
++        std::size_t secondquote = strargs.find('"', firstquote + 1);
++
++        if (firstquote == std::string::npos || secondquote == std::string::npos)
++        {
++            handler->PSendSysMessage("Please enclose the guildname in quoutation marks (\"\")");
++            return 0;
++        }
++
++        std::string guildName = strargs.substr(firstquote + 1, secondquote - 1);
++        std::size_t levelstrstart = strargs.find(' ', secondquote + 1);
++
++        if (levelstrstart == std::string::npos)
++        {
++            handler->PSendSysMessage("Please follow the bloody fucking syntax");
++            return 0;
++        }
++
++        std::string levelStr = strargs.substr(levelstrstart, std::string::npos);
++        int64_t level = 0;
++
++        try {
++            level = std::stoll(levelStr);
++        }
++        catch (std::invalid_argument ex)
++        {
++            handler->PSendSysMessage("Please enter the level as a number");
++            return 0;
++        }
++        catch (std::out_of_range ex)
++        {
++            handler->PSendSysMessage("Please provide a reasonable fucking level");
++        }
++
++        handler->PSendSysMessage("Entered guildname: [%s] guildlevel: [%s]", guildName, levelStr);
++
++        //return 0;
++
++        //uint8 newLevel = uint8(atoi(levelStr));
++        Guild* guild = sGuildMgr->GetGuildByName(guildName);
++
++        if (guild)
++        {
++            if (level > GUILD_MAX_LEVEL)
++            {
++                handler->PSendSysMessage("Your guild is max level");
++                return false;
++            }
++            else
++                guild->SetLevel(level, true);
++        }
++        else
++        {
++            handler->PSendSysMessage("There is no guild named [%s] found. So we cannot make it level [%s]", guildName, levelStr);
 +            return false;
 +        }
 +
@@ -1157,22 +1226,52 @@ index ae71814a03..c080b4463d 100644
 +        if (!*args)
 +            return false;
 +
-+        char* guildNameStr;
-+        char* xpStr;
-+        handler->extractOptFirstArg((char*)args, &guildNameStr, &xpStr);
++        std::string strargs = args;
 +
-+        if (!xpStr)
-+            return false;
++        std::size_t firstquote = strargs.find('"');
++        std::size_t secondquote = strargs.find('"', firstquote + 1);
 +
-+        uint32 value = uint32(atoi(xpStr));
++        if (firstquote == std::string::npos || secondquote == std::string::npos)
++        {
++            handler->PSendSysMessage("Please enclose the guildname in quoutation marks (\"\")");
++            return 0;
++        }
 +
-+        Guild* guild = sGuildMgr->GetGuildByName(guildNameStr);
++        std::string guildName = strargs.substr(firstquote + 1, secondquote - 1);
++        std::size_t levelstrstart = strargs.find(' ', secondquote + 1);
++
++        if (levelstrstart == std::string::npos)
++        {
++            handler->PSendSysMessage("Please follow the bloody fucking syntax");
++            return 0;
++        }
++
++        std::string xpStr = strargs.substr(levelstrstart, std::string::npos);
++        int64_t value = 0;
++
++        try {
++            value = std::stoll(xpStr);
++        }
++        catch (std::invalid_argument ex)
++        {
++            handler->PSendSysMessage("Please enter the Experience as a number");
++            return 0;
++        }
++        catch (std::out_of_range ex)
++        {
++            handler->PSendSysMessage("Please provide a a reasonable fucking experience");
++        }
++
++        handler->PSendSysMessage("Entered guildname: [%s] guildlevel: [%s]", guildName, xpStr);
++
++
++        Guild* guild = sGuildMgr->GetGuildByName(guildName);
 +
 +        if (guild)
 +            guild->GiveXp(value);
 +        else
 +        {
-+            handler->PSendSysMessage("There was no guild with the name [%s] found.", guildNameStr);
++            handler->PSendSysMessage("There was no guild with the name [%s] found so we could not add [%s] experience", guildName, xpStr);
 +            return false;
 +        }
 +
