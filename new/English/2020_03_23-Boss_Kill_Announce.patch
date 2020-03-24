@@ -1,0 +1,66 @@
+From 9c227adc2c2b46582fdf5e2baf0d94c58e870faf Mon Sep 17 00:00:00 2001
+From: LordPsyan <lordpsyan@gmail.com>
+Date: Tue, 24 Mar 2020 03:20:06 -0500
+Subject: [PATCH] 2020_03_23-Boss_Kill_Announce
+
+---
+ src/server/scripts/Custom/Boss_Announcer.cpp  | 25 +++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |  3 ++-
+ 2 files changed, 27 insertions(+), 1 deletion(-)
+ create mode 100644 src/server/scripts/Custom/Boss_Announcer.cpp
+
+diff --git a/src/server/scripts/Custom/Boss_Announcer.cpp b/src/server/scripts/Custom/Boss_Announcer.cpp
+new file mode 100644
+index 0000000000..26518f024c
+--- /dev/null
++++ b/src/server/scripts/Custom/Boss_Announcer.cpp
+@@ -0,0 +1,25 @@
++#include "LordPsyan.h"
++
++class Boss_Announcer : public PlayerScript
++{
++public:
++Boss_Announcer() : PlayerScript ("Boss_Announcer") {}
++
++void OnCreatureKill(Player* player, Creature* boss)
++{
++
++if (boss->isWorldBoss())
++{
++std::string plrname = player->GetName();
++std::string bossname = boss->GetName();	
++char msg[250];
++snprintf(msg, 250, "|cffffff00[|r|c00077766Anuncio del Boss|r|cffffff00]:|r|cffff0000 %s |r and his group killed world boss |CFF18BE00[%s]|r !!!",plrname.c_str(),bossname.c_str());
++sWorld->SendServerMessage(SERVER_MSG_STRING, msg);
++}
++}
++};
++
++void AddSC_Boss_Announcer()
++{
++new Boss_Announcer;
++}
+diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
+index b6b83ac184..06786fb981 100644
+--- a/src/server/scripts/Custom/custom_script_loader.cpp
++++ b/src/server/scripts/Custom/custom_script_loader.cpp
+@@ -14,7 +14,7 @@
+  * You should have received a copy of the GNU General Public License along
+  * with this program. If not, see <http://www.gnu.org/licenses/>.
+  */
+-
++void AddSC_Boss_Announcer();
+ // This is where scripts' loading functions should be declared:
+ // start01
+ // start02
+@@ -221,6 +221,7 @@
+ // void Add${NameOfDirectory}Scripts()
+ void AddCustomScripts()
+ {
++    AddSC_Boss_Announcer();
+ // end01
+ // end02
+ // end03
+-- 
+2.20.1
+
