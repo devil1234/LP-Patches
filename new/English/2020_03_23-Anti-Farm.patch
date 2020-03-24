@@ -1,0 +1,96 @@
+From 3fecf34ba0a3b829e34584724052cb56bb07da14 Mon Sep 17 00:00:00 2001
+From: LordPsyan <lordpsyan@gmail.com>
+Date: Tue, 24 Mar 2020 05:26:58 -0500
+Subject: [PATCH] 2020_03_23-Anti-Farm
+
+---
+ src/server/scripts/Custom/anti_farm.cpp       | 54 +++++++++++++++++++
+ .../scripts/Custom/custom_script_loader.cpp   |  3 +-
+ 2 files changed, 56 insertions(+), 1 deletion(-)
+ create mode 100644 src/server/scripts/Custom/anti_farm.cpp
+
+diff --git a/src/server/scripts/Custom/anti_farm.cpp b/src/server/scripts/Custom/anti_farm.cpp
+new file mode 100644
+index 0000000000..bb92733938
+--- /dev/null
++++ b/src/server/scripts/Custom/anti_farm.cpp
+@@ -0,0 +1,54 @@
++/*
++ * Copyright (C) 2016 DeathCore <http://www.noffearrdeathproject.org/>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or (at your
++ * option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program. If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "ScriptPCH.h"
++#include "LordPsyan.h"
++
++class NoFarming : public PlayerScript
++{
++public: NoFarming() : PlayerScript("NoFarming") {}
++
++void OnPVPKill(Player * killer, Player * killed)
++{
++        if (killer->GetGUID() == killed->GetGUID())
++        {
++                return;
++        }
++
++        if (killer->GetSession()->GetRemoteAddress() == killed->GetSession()->GetRemoteAddress() || killed->GetMaxHealth() <= 10000) // Normally players try farm with new characters with low health then modify the Health according your server.
++        {
++                std::string str = "";
++                SessionMap ss = sWorld->GetAllSessions();
++                for (SessionMap::const_iterator itr = ss.begin(); itr != ss.end(); ++itr)
++                        if (itr->second->GetSecurity() > 0)
++                str = "|cFFFFFC00[Anti-Farm System]|cFF00FFFF[|cFF60FF00" + std::string(killer->GetName()) + "|cFF00FFFF] Possivel Farmer |CFFEE0000 [ATENÇÃO GMS!]";
++                WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
++                data << str;
++                sWorld->SendGlobalGMMessage(&data);
++        }
++        else
++        {
++                return;
++        }
++
++}
++
++};
++void AddSC_NoFarming()
++{
++   new NoFarming;
++}
+\ No newline at end of file
+diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
+index b6b83ac184..51fa878945 100644
+--- a/src/server/scripts/Custom/custom_script_loader.cpp
++++ b/src/server/scripts/Custom/custom_script_loader.cpp
+@@ -14,7 +14,7 @@
+  * You should have received a copy of the GNU General Public License along
+  * with this program. If not, see <http://www.gnu.org/licenses/>.
+  */
+-
++void AddSC_NoFarming();
+ // This is where scripts' loading functions should be declared:
+ // start01
+ // start02
+@@ -221,6 +221,7 @@
+ // void Add${NameOfDirectory}Scripts()
+ void AddCustomScripts()
+ {
++    AddSC_NoFarming();
+ // end01
+ // end02
+ // end03
+-- 
+2.20.1
+
