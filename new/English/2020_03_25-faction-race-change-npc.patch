@@ -1,0 +1,168 @@
+From d774bc939aaa08dbba61190ab4311819486aa52d Mon Sep 17 00:00:00 2001
+From: LordPsyan <lordpsyan@gmail.com>
+Date: Wed, 25 Mar 2020 11:14:22 -0500
+Subject: [PATCH] 2020_03_25-faction-race-change-npc
+
+---
+ .../scripts/Custom/custom_script_loader.cpp   |   3 +-
+ src/server/scripts/Custom/factionchange.cpp   | 126 ++++++++++++++++++
+ 2 files changed, 128 insertions(+), 1 deletion(-)
+ create mode 100644 src/server/scripts/Custom/factionchange.cpp
+
+diff --git a/src/server/scripts/Custom/custom_script_loader.cpp b/src/server/scripts/Custom/custom_script_loader.cpp
+index b6b83ac184..cf5700d61e 100644
+--- a/src/server/scripts/Custom/custom_script_loader.cpp
++++ b/src/server/scripts/Custom/custom_script_loader.cpp
+@@ -14,7 +14,7 @@
+  * You should have received a copy of the GNU General Public License along
+  * with this program. If not, see <http://www.gnu.org/licenses/>.
+  */
+-
++void AddSC_npc_changer();
+ // This is where scripts' loading functions should be declared:
+ // start01
+ // start02
+@@ -221,6 +221,7 @@
+ // void Add${NameOfDirectory}Scripts()
+ void AddCustomScripts()
+ {
++    AddSC_npc_changer();
+ // end01
+ // end02
+ // end03
+diff --git a/src/server/scripts/Custom/factionchange.cpp b/src/server/scripts/Custom/factionchange.cpp
+new file mode 100644
+index 0000000000..514696c722
+--- /dev/null
++++ b/src/server/scripts/Custom/factionchange.cpp
+@@ -0,0 +1,126 @@
++/*
++<--------------------------------------------------------------------------->
++ - Developer(s): Ghostcrawler336
++ - Complete: 100%
++ - ScriptName: 'Faction / Race Changer' 
++ - Comment: Untested
++ - Updated - 8/7/2013 or 7/8/2013
++<--------------------------------------------------------------------------->
++*/
++#include "ScriptMgr.h"
++#include "Cell.h"
++#include "CellImpl.h"
++#include "GameEventMgr.h"
++#include "GridNotifiers.h"
++#include "GridNotifiersImpl.h"
++#include "Unit.h"
++#include "GameObject.h"
++#include "ScriptedCreature.h"
++#include "ScriptedGossip.h"
++#include "InstanceScript.h"
++#include "CombatAI.h"
++#include "PassiveAI.h"
++#include "Chat.h"
++#include "DBCStructure.h"
++#include "DBCStores.h"
++#include "ObjectMgr.h"
++#include "SpellScript.h"
++#include "SpellAuraEffects.h"
++
++enum  defines
++{
++ faction_token = 999888, // Faction Change Token
++ race_token = 999888 // Race Change Token
++};
++
++class npc_changer : public CreatureScript
++{
++	public:
++		npc_changer() : CreatureScript("npc_changer"){}
++
++		static bool OnGossipHello(Player * pPlayer, Creature * pCreature)
++		{
++			
++			
++			AddGossipItemFor(pPlayer, 4, "Change My Race ", GOSSIP_SENDER_MAIN, 0);
++		    AddGossipItemFor(pPlayer, 4, "Change My Faction", GOSSIP_SENDER_MAIN, 1);
++			SendGossipMenuFor(pPlayer, 9425, pCreature->GetGUID());
++			return true;
++		}
++
++		static bool OnGossipSelect(Player * Player, Creature * Creature, uint32 /*uiSender*/, uint32 uiAction)
++		{
++			if(!Player)
++				return true;
++
++			switch(uiAction)
++			{
++				case 0:
++					if(Player->HasItemCount(race_token, 1))
++					{
++						Player->DestroyItemCount(race_token, 1, true, false);
++						Player->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
++						Player->GetSession()->SendNotification("You need to relog, to change your race!   --BlackArmy WoW--");
++						CloseGossipMenuFor(Player);
++					}
++					else
++					{
++						Player->GetSession()->SendNotification("You need atleast one race change token!    --BlackArmy WoW--");
++						CloseGossipMenuFor(Player);
++					}
++					break;
++				case 1:
++					if(Player->HasItemCount(faction_token, 1))
++					{
++						Player->DestroyItemCount(faction_token, 1, true, false);
++						Player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
++						Player->GetSession()->SendNotification("You need to relog, to change your faction!    --BlackArmy WoW--");
++						CloseGossipMenuFor(Player);
++					}
++					else
++					{
++						Player->GetSession()->SendNotification("You need atleast one faction change token!    --BlackArmy WoW--");
++						CloseGossipMenuFor(Player);
++					}
++					break;
++			}
++			return true;
++		}
++
++    static bool OnGossipSelectCode(Player* player, Creature* m_creature, uint32 sender, uint32 action, char const* code)
++        {
++            player->PlayerTalkClass->ClearMenus();
++            // code
++            return true;
++        }
++    struct MyAI : public ScriptedAI
++        {
++            MyAI(Creature* m_creature) : ScriptedAI(m_creature) { }
++            bool GossipHello(Player* player) override
++            {
++                return OnGossipHello(player, me);
++            }
++            bool GossipSelect(Player* player, uint32 menuId, uint32 gossipListId) override
++            {
++                uint32 sender = player->PlayerTalkClass->GetGossipOptionSender(gossipListId);
++                uint32 action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
++                return OnGossipSelect(player, me, sender, action);
++            }
++            bool GossipSelectCode(Player* player, uint32 menuId, uint32 gossipListId, char const* code) override
++            {
++                uint32 sender = player->PlayerTalkClass->GetGossipOptionSender(gossipListId);
++                uint32 action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
++                return OnGossipSelectCode(player, me, sender, action, code);
++            }
++        };
++
++    CreatureAI* GetAI(Creature* m_creature) const override
++        {
++            return new MyAI(m_creature);
++        }
++};
++
++void AddSC_npc_changer()
++{
++	new npc_changer();
++}
+\ No newline at end of file
+-- 
+2.20.1
+
